@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hub des projets — Testeur</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa7bf;--accent:#06b6d4;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:#e6eef8;background:linear-gradient(180deg,#071022 0%,#071634 100%);-webkit-font-smoothing:antialiased}
+    .wrap{max-width:1100px;margin:40px auto;padding:24px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:4px 0 0;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:20px}
+    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .card h2{margin:0 0 8px;font-size:16px}
+    .meta{color:var(--muted);font-size:13px;margin-bottom:12px}
+    .btns{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+    .btn:focus{outline:3px solid rgba(6,182,212,0.18)}
+    .link{background:transparent;color:var(--accent);border:1px solid rgba(6,182,212,0.12)}
+    .run{background:var(--accent);color:#052026}
+    .demo{background:var(--glass);color:#dbeafe;border:1px solid rgba(255,255,255,0.04)}
+    footer{margin-top:28px;color:var(--muted);font-size:13px}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    /* Modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.8));z-index:80}
+    .modal.open{display:flex}
+    .panel{width:min(920px,96%);max-height:90vh;overflow:auto;background:linear-gradient(180deg,#071122, #062437);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+    .panel header{display:flex;justify-content:space-between;align-items:center}
+    .close{background:transparent;border:0;color:var(--muted);font-size:16px;padding:6px;cursor:pointer}
+    /* small app styles */
+    .app-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    input[type="number"],input[type="text"],select{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    button.small{padding:8px 10px;border-radius:8px;border:0;background:var(--accent);color:#052026;font-weight:600}
+    .list{margin-top:12px}
+    @media (max-width:480px){.wrap{padding:16px;margin:18px auto}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden>H</div>
+      <div>
+        <h1>Hub de projets — Aperçu & tests</h1>
+        <p class="lead">Ouvrez les fichiers ou testez des versions web simplifiées ici — sans afficher les scripts.</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="grid" aria-label="Projets">
+        <article class="card" id="card-calculatrice">
+          <h2>Calculatrice</h2>
+          <div class="meta">Fichier: calculatrice.py</div>
+          <div class="btns">
+            <a class="btn link" href="calculatrice.py" target="_blank" rel="noopener">Ouvrir le fichier</a>
+            <button class="btn run" data-demo="calculatrice">Tester ici</button>
+          </div>
+        </article>
+
+        <article class="card" id="card-imc">
+          <h2>Calcul IMC</h2>
+          <div class="meta">Fichier: calcule imc.py</div>
+          <div class="btns">
+            <a class="btn link" href="calcule%20imc.py" target="_blank" rel="noopener">Ouvrir le fichier</a>
+            <button class="btn demo" data-demo="imc">Tester ici</button>
+          </div>
+        </article>
+
+        <article class="card" id="card-devine">
+          <h2>Devine le nombre (version avancée)</h2>
+          <div class="meta">Fichier: devine le nombre version avancé.py</div>
+          <div class="btns">
+            <a class="btn link" href="devine%20le%20nombre%20version%20avanc%C3%A9.py" target="_blank" rel="noopener">Ouvrir le fichier</a>
+            <button class="btn run" data-demo="devine">Tester ici</button>
+          </div>
+        </article>
+
+        <article class="card" id="card-carnet">
+          <h2>Carnet d'élèves</h2>
+          <div class="meta">Dossier: Carnet d'eleves — ajoute un élève et sa note puis visualise la liste.</div>
+          <div class="btns">
+            <a class="btn link" href="Carnet%20d%27eleves/" target="_blank" rel="noopener">Ouvrir le dossier</a>
+            <button class="btn demo" data-demo="carnet">Tester ici</button>
+          </div>
+        </article>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="panel" role="document">
+      <header>
+        <strong id="modal-title">Demo</strong>
+        <div>
+          <button class="close" id="reset-and-close">Réinitialiser & fermer</button>
+        </div>
+      </header>
+      <div id="modal-body" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <script>
+    // Accessibility helpers
+    const modal = document.getElementById('modal');
+    const modalBody = document.getElementById('modal-body');
+    const modalTitle = document.getElementById('modal-title');
+    const resetClose = document.getElementById('reset-and-close');
+
+    function openModal(title, contentGenerator){
+      modalTitle.textContent = title;
+      modalBody.innerHTML = '';
+      contentGenerator(modalBody);
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      // focus first focusable
+      const f = modal.querySelector('button, input, [tabindex]'); if(f) f.focus();
+    }
+    function closeModal(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+      modalBody.innerHTML = '';
+    }
+    resetClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
+    // Demos
+    function demoCalculatrice(root){
+      const out = document.createElement('div');
+      out.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <input aria-label="Écran" id="calc-screen" readonly style="font-size:20px;padding:10px;border-radius:8px;background:#021021;color:#e6eef8;border:1px solid rgba(255,255,255,0.04)">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <button class="small">7</button><button class="small">8</button><button class="small">9</button><button class="small">/</button>
+            <button class="small">4</button><button class="small">5</button><button class="small">6</button><button class="small">*</button>
+            <button class="small">1</button><button class="small">2</button><button class="small">3</button><button class="small">-</button>
+            <button class="small">0</button><button class="small">.</button><button class="small">=</button><button class="small">+</button>
+          </div>
+        </div>`;
+      root.appendChild(out);
+      const screen = root.querySelector('#calc-screen');
+      let expr = '';
+      root.querySelectorAll('button.small').forEach(b=>b.addEventListener('click',()=>{
+        const v = b.textContent;
+        if(v==='='){
+          try{ expr = String(eval(expr)); screen.value = expr }catch(e){ screen.value = 'Erreur' }
+        } else { expr += v; screen.value = expr }
+      }));
+    }
+
+    function demoIMC(root){
+      const cont = document.createElement('div');
+      cont.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <label>Poids (kg): <input id="poids" type="number" min="0" step="0.1"></label>
+          <label>Taille (m): <input id="taille" type="number" min="0" step="0.01"></label>
+          <div style="display:flex;gap:8px"><button id="calc-bmi" class="small">Calculer</button><div id="bmi-res" style="align-self:center;color:var(--muted)"></div></div>
+        </div>`;
+      root.appendChild(cont);
+      cont.querySelector('#calc-bmi').addEventListener('click',()=>{
+        const p = parseFloat(cont.querySelector('#poids').value);
+        const t = parseFloat(cont.querySelector('#taille').value);
+        if(!p||!t){ cont.querySelector('#bmi-res').textContent='Entrez poids et taille.'; return }
+        const bmi = p/(t*t);
+        let cat = '';
+        if(bmi<18.5) cat='Insuffisance pondérale';
+        else if(bmi<25) cat='Poids normal';
+        else if(bmi<30) cat='Surpoids'; else cat='Obésité';
+        cont.querySelector('#bmi-res').textContent = `${bmi.toFixed(1)} — ${cat}`;
+      });
+    }
+
+    function demoDevine(root){
+      const cont = document.createElement('div');
+      cont.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div id="hint" style="color:var(--muted)">Je choisis un nombre entre 1 et 100.</div>
+          <div style="display:flex;gap:8px"><input id="guess" type="number" min="1" max="100"><button id="try" class="small">Essayer</button></div>
+          <div id="res" style="margin-top:6px;color:var(--muted)"></div>
+        </div>`;
+      root.appendChild(cont);
+      let secret = Math.floor(Math.random()*100)+1; let tries=0;
+      cont.querySelector('#try').addEventListener('click',()=>{
+        const g = Number(cont.querySelector('#guess').value); tries++;
+        const r = cont.querySelector('#res');
+        if(!g){ r.textContent='Entrez un nombre'; return }
+        if(g===secret) r.textContent = `Bravo ! Trouvé en ${tries} essais.`;
+        else if(g<secret) r.textContent='Trop petit.'; else r.textContent='Trop grand.';
+      });
+    }
+
+    function demoCarnet(root){
+      const cont = document.createElement('div');
+      cont.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:8px"><input id="name" placeholder="Nom de l'élève"><input id="note" placeholder="Note" type="text"><button id="add" class="small">Ajouter</button></div>
+          <div class="list" id="students"></div>
+        </div>`;
+      root.appendChild(cont);
+      const list = cont.querySelector('#students');
+      const stateKey='hub_carnet_v1';
+      function load(){ const s = JSON.parse(localStorage.getItem(stateKey)||'[]'); render(s); }
+      function render(arr){ list.innerHTML = arr.map((it,i)=>`<div style="display:flex;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px"><div><strong>${escapeHtml(it.name)}</strong><div style="color:var(--muted);font-size:13px">${escapeHtml(it.note)}</div></div><div><button data-i="${i}" class="small rm">Suppr</button></div></div>`).join('') }
+      function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
+      cont.querySelector('#add').addEventListener('click',()=>{
+        const name = cont.querySelector('#name').value.trim(); const note = cont.querySelector('#note').value.trim(); if(!name) return;
+        const arr = JSON.parse(localStorage.getItem(stateKey)||'[]'); arr.push({name, note}); localStorage.setItem(stateKey, JSON.stringify(arr)); load();
+      });
+      list.addEventListener('click',(e)=>{ if(e.target.matches('.rm')){ const i=Number(e.target.dataset.i); const arr=JSON.parse(localStorage.getItem(stateKey)||'[]'); arr.splice(i,1); localStorage.setItem(stateKey,JSON.stringify(arr)); load(); } });
+      load();
+    }
+
+    document.querySelectorAll('button[data-demo]').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const d = b.dataset.demo;
+        if(d==='calculatrice') openModal('Calculatrice — Démo', demoCalculatrice);
+        if(d==='imc') openModal('Calcul IMC — Démo', demoIMC);
+        if(d==='devine') openModal('Devine le nombre — Démo', demoDevine);
+        if(d==='carnet') openModal("Carnet d'élèves — Démo", demoCarnet);
+      });
+    });
+
+    // Safety: prevent accidental navigation when using keyboard inside modal
+    modal.addEventListener('keydown', (e)=>{ if(e.key==='Tab'){ const focusables = modal.querySelectorAll('button, input, [tabindex]'); if(focusables.length){ e.preventDefault(); focusables[0].focus(); } } });
+  </script>
+</body>
+</html>
