@@ -1,5 +1,5 @@
 # my-beginnings
-Here is My first project (no ai) 
+Here is My first project 
 
 
 
