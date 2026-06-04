@@ -1,6 +1,3 @@
-# Carnet d'élèves simple
-# Ici on utilise un dictionnaire qui contient les notes de chaque élève.
-
 carnet = {
     "Alice": [18, 10],
     "Yanis": [9, 15],
@@ -8,7 +5,6 @@ carnet = {
     "andoni": [14, 16]
 }
 
-# Affiche le carnet d'élèves
 for nom, notes in carnet.items():
     print(nom, notes)
 
@@ -20,8 +16,6 @@ print("Moyenne de Yanis :", moyenne(carnet["Yanis"]))
 print("Moyenne de Alex :", moyenne(carnet["Alex"]))
 print("Moyenne de andoni :", moyenne(carnet["andoni"]))
 
-# Fonction qui cherche l'élève avec la meilleure moyenne
-# Retourne le nom et la moyenne la plus haute
 
 def meilleure_moyenne(carnet):
     meilleur_nom = None
