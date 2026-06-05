@@ -26,14 +26,11 @@
     .demo{background:var(--glass);color:#dbeafe;border:1px solid rgba(255,255,255,0.04)}
     footer{margin-top:28px;color:var(--muted);font-size:13px}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-   
     .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.8));z-index:80}
     .modal.open{display:flex}
     .panel{width:min(920px,96%);max-height:90vh;overflow:auto;background:linear-gradient(180deg,#071122, #062437);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
     .panel header{display:flex;justify-content:space-between;align-items:center}
     .close{background:transparent;border:0;color:var(--muted);font-size:16px;padding:6px;cursor:pointer}
-   
-    .app-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     input[type="number"],input[type="text"],select{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
     button.small{padding:8px 10px;border-radius:8px;border:0;background:var(--accent);color:#052026;font-weight:600}
     .list{margin-top:12px}
@@ -45,8 +42,8 @@
     <header>
       <div class="logo" aria-hidden>H</div>
       <div>
-        <h1>Hub de projets — Aperçu & tests</h1>
-        <p class="lead">Ouvrez les fichiers ou testez des versions web simplifiées ici — sans afficher les scripts.</p>
+        <h1>Mes projets Python</h1>
+        <p class="lead">Ouvrez ou testez vos programmes.</p>
       </div>
     </header>
 
@@ -79,12 +76,39 @@
           </div>
         </article>
 
+        <article class="card" id="card-pandu">
+          <h2>Jeu du pandu</h2>
+          <div class="meta">Fichier: Jeu du pandu.pas mal dur.py</div>
+          <div class="btns">
+            <a class="btn link" href="Jeu%20du%20pandu.pas%20mal%20dur.py" target="_blank" rel="noopener">Ouvrir le fichier</a>
+            <button class="btn demo" data-demo="pandu">Tester ici</button>
+          </div>
+        </article>
+
         <article class="card" id="card-carnet">
           <h2>Carnet d'élèves</h2>
-          <div class="meta">Dossier: Carnet d'eleves — ajoute un élève et sa note puis visualise la liste.</div>
+          <div class="meta">Dossier: Carnet d'eleves</div>
           <div class="btns">
             <a class="btn link" href="Carnet%20d%27eleves/" target="_blank" rel="noopener">Ouvrir le dossier</a>
             <button class="btn demo" data-demo="carnet">Tester ici</button>
+          </div>
+        </article>
+
+        <article class="card" id="card-horloge">
+          <h2>Horloge / Chronomètre</h2>
+          <div class="meta">Fichier: horloge.py</div>
+          <div class="btns">
+            <a class="btn link" href="horloge.py" target="_blank" rel="noopener">Ouvrir le fichier</a>
+            <button class="btn demo" data-demo="horloge">Tester ici</button>
+          </div>
+        </article>
+
+        <article class="card" id="card-inventaire">
+          <h2>Inventaire RPG</h2>
+          <div class="meta">Fichier: compteur de voyelle.py</div>
+          <div class="btns">
+            <a class="btn link" href="compteur%20de%20voyelle.py" target="_blank" rel="noopener">Ouvrir le fichier</a>
+            <button class="btn demo" data-demo="inventaire">Tester ici</button>
           </div>
         </article>
       </section>
@@ -105,7 +129,6 @@
   </div>
 
   <script>
- 
     const modal = document.getElementById('modal');
     const modalBody = document.getElementById('modal-body');
     const modalTitle = document.getElementById('modal-title');
@@ -117,19 +140,20 @@
       contentGenerator(modalBody);
       modal.classList.add('open');
       modal.setAttribute('aria-hidden','false');
- 
-      const f = modal.querySelector('button, input, [tabindex]'); if(f) f.focus();
+      const f = modal.querySelector('button, input, [tabindex]');
+      if(f) f.focus();
     }
+
     function closeModal(){
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden','true');
       modalBody.innerHTML = '';
     }
+
     resetClose.addEventListener('click', closeModal);
     modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
 
-    // Demos
     function demoCalculatrice(root){
       const out = document.createElement('div');
       out.innerHTML = `
@@ -184,13 +208,16 @@
           <div id="res" style="margin-top:6px;color:var(--muted)"></div>
         </div>`;
       root.appendChild(cont);
-      let secret = Math.floor(Math.random()*100)+1; let tries=0;
+      let secret = Math.floor(Math.random()*100)+1;
+      let tries=0;
       cont.querySelector('#try').addEventListener('click',()=>{
-        const g = Number(cont.querySelector('#guess').value); tries++;
+        const g = Number(cont.querySelector('#guess').value);
+        tries++;
         const r = cont.querySelector('#res');
         if(!g){ r.textContent='Entrez un nombre'; return }
         if(g===secret) r.textContent = `Bravo ! Trouvé en ${tries} essais.`;
-        else if(g<secret) r.textContent='Trop petit.'; else r.textContent='Trop grand.';
+        else if(g<secret) r.textContent='Trop petit.';
+        else r.textContent='Trop grand.';
       });
     }
 
@@ -208,11 +235,187 @@
       function render(arr){ list.innerHTML = arr.map((it,i)=>`<div style="display:flex;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px"><div><strong>${escapeHtml(it.name)}</strong><div style="color:var(--muted);font-size:13px">${escapeHtml(it.note)}</div></div><div><button data-i="${i}" class="small rm">Suppr</button></div></div>`).join('') }
       function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
       cont.querySelector('#add').addEventListener('click',()=>{
-        const name = cont.querySelector('#name').value.trim(); const note = cont.querySelector('#note').value.trim(); if(!name) return;
-        const arr = JSON.parse(localStorage.getItem(stateKey)||'[]'); arr.push({name, note}); localStorage.setItem(stateKey, JSON.stringify(arr)); load();
+        const name = cont.querySelector('#name').value.trim();
+        const note = cont.querySelector('#note').value.trim();
+        if(!name) return;
+        const arr = JSON.parse(localStorage.getItem(stateKey)||'[]');
+        arr.push({name, note});
+        localStorage.setItem(stateKey, JSON.stringify(arr));
+        load();
       });
       list.addEventListener('click',(e)=>{ if(e.target.matches('.rm')){ const i=Number(e.target.dataset.i); const arr=JSON.parse(localStorage.getItem(stateKey)||'[]'); arr.splice(i,1); localStorage.setItem(stateKey,JSON.stringify(arr)); load(); } });
       load();
+    }
+
+    function demoPandu(root){
+      const cont = document.createElement('div');
+      cont.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="color:var(--muted);">Jeu du pandu : devine le mot caché en 6 essais.</div>
+          <div style="display:flex;gap:8px"><input id="pandu-guess" type="text" placeholder="Propose une lettre"><button id="pandu-try" class="small">Essayer</button></div>
+          <div id="pandu-word" style="font-size:18px;letter-spacing:0.2em;color:#dbeafe"></div>
+          <div id="pandu-res" style="margin-top:6px;color:var(--muted)"></div>
+        </div>`;
+      root.appendChild(cont);
+      const secret = 'pandu';
+      let display = Array(secret.length).fill('_');
+      let tries = 0;
+      cont.querySelector('#pandu-word').textContent = display.join(' ');
+      cont.querySelector('#pandu-try').addEventListener('click',()=>{
+        const input = cont.querySelector('#pandu-guess');
+        const letter = input.value.trim().toLowerCase();
+        const res = cont.querySelector('#pandu-res');
+        input.value = '';
+        if(!letter || letter.length !== 1){ res.textContent = 'Entre une seule lettre.'; return }
+        if(display.join('') === secret){ res.textContent = 'Tu as déjà gagné !'; return }
+        tries += 1;
+        let found = false;
+        for(let i=0;i<secret.length;i++){
+          if(secret[i] === letter){ display[i] = letter; found = true; }
+        }
+        cont.querySelector('#pandu-word').textContent = display.join(' ');
+        if(display.join('') === secret){ res.textContent = `Bravo ! Tu as trouvé en ${tries} essais.`; return }
+        if(!found){ res.textContent = `Lettre absente. Essais : ${tries}/6`; }
+        if(tries >= 6 && display.join('') !== secret){ res.textContent = `Perdu. Le mot était «${secret}».`; }
+      });
+    }
+
+    function demoHorloge(root){
+      const cont = document.createElement('div');
+      cont.style.display = 'flex';
+      cont.style.flexDirection = 'column';
+      cont.style.gap = '12px';
+      cont.innerHTML = `
+        <div style="font-family:monospace;font-size:34px;color:#dbeafe;text-align:center" id="clock-display">00:00:00.000</div>
+        <div style="display:flex;gap:8px;justify-content:center">
+          <button id="clk-start" class="small">Start</button>
+          <button id="clk-stop" class="small" disabled>Stop</button>
+          <button id="clk-reset" class="small" disabled>Reset</button>
+        </div>
+      `;
+      root.appendChild(cont);
+
+      let running = false;
+      let startTime = 0;
+      let elapsed = 0; // ms
+      let rafId = null;
+
+      const disp = cont.querySelector('#clock-display');
+      const bStart = cont.querySelector('#clk-start');
+      const bStop = cont.querySelector('#clk-stop');
+      const bReset = cont.querySelector('#clk-reset');
+
+      function format(ms){
+        const hours = Math.floor(ms/3600000);
+        ms %= 3600000;
+        const minutes = Math.floor(ms/60000);
+        ms %= 60000;
+        const seconds = Math.floor(ms/1000);
+        const milli = ms % 1000;
+        return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${String(milli).padStart(3,'0')}`;
+      }
+
+      function tick(){
+        const now = performance.now();
+        const total = elapsed + (running ? now - startTime : 0);
+        disp.textContent = format(Math.floor(total));
+        rafId = requestAnimationFrame(tick);
+      }
+
+      bStart.addEventListener('click', ()=>{
+        if(running) return;
+        running = true;
+        startTime = performance.now();
+        bStart.disabled = true;
+        bStop.disabled = false;
+        bReset.disabled = true;
+        if(!rafId) rafId = requestAnimationFrame(tick);
+      });
+
+      bStop.addEventListener('click', ()=>{
+        if(!running) return;
+        running = false;
+        const now = performance.now();
+        elapsed += now - startTime;
+        startTime = 0;
+        bStart.disabled = false;
+        bStop.disabled = true;
+        bReset.disabled = false;
+      });
+
+      bReset.addEventListener('click', ()=>{
+        running = false;
+        elapsed = 0;
+        startTime = 0;
+        disp.textContent = '00:00:00.000';
+        bStart.disabled = false;
+        bStop.disabled = true;
+        bReset.disabled = true;
+      });
+
+     
+      if(!rafId) rafId = requestAnimationFrame(tick);
+    }
+
+    function demoInventaire(root){
+      const cont = document.createElement('div');
+      cont.style.display = 'flex';
+      cont.style.flexDirection = 'column';
+      cont.style.gap = '10px';
+      cont.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr;gap:8px">
+          <div id="slots" style="display:grid;gap:6px"></div>
+          <input id="inventaire-input" type="text" placeholder="Nom de l'objet" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:#021021;color:#e6eef8">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button id="add-item" class="small">Ajouter</button>
+            <button id="remove-item" class="small">Supprimer</button>
+          </div>
+          <div id="inventaire-message" style="color:var(--muted);font-size:13px"></div>
+        </div>`;
+      root.appendChild(cont);
+
+      const slots = cont.querySelector('#slots');
+      const message = cont.querySelector('#inventaire-message');
+      const input = cont.querySelector('#inventaire-input');
+      const items = ['vide','vide','vide','vide','vide'];
+
+      function renderSlots(){
+        slots.innerHTML = items.map((item,index)=>
+          `<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center">`+
+          `<span>Slot ${index+1}</span><strong>${item}</strong></div>`
+        ).join('');
+      }
+
+      function showMessage(text){
+        message.textContent = text;
+      }
+
+      cont.querySelector('#add-item').addEventListener('click',()=>{
+        const value = input.value.trim();
+        if(!value){ showMessage('Entrez le nom de l\'objet.'); return; }
+        const firstEmpty = items.indexOf('vide');
+        if(firstEmpty === -1){ showMessage('Inventaire plein'); return; }
+        items[firstEmpty] = value;
+        input.value = '';
+        renderSlots();
+        showMessage(`Ajouté dans le slot ${firstEmpty + 1}`);
+      });
+
+      cont.querySelector('#remove-item').addEventListener('click',()=>{
+        const value = input.value.trim();
+        if(!value){ showMessage('Entrez le nom de l\'objet.'); return; }
+        const index = items.findIndex(item => item.toLowerCase() === value.toLowerCase());
+        if(index === -1 || items[index] === 'vide'){
+          showMessage('Objet non trouvé');
+          return;
+        }
+        items[index] = 'vide';
+        input.value = '';
+        renderSlots();
+        showMessage(`Supprimé du slot ${index + 1}`);
+      });
+
+      renderSlots();
     }
 
     document.querySelectorAll('button[data-demo]').forEach(b=>{
@@ -222,10 +425,11 @@
         if(d==='imc') openModal('Calcul IMC — Démo', demoIMC);
         if(d==='devine') openModal('Devine le nombre — Démo', demoDevine);
         if(d==='carnet') openModal("Carnet d'élèves — Démo", demoCarnet);
+        if(d==='pandu') openModal('Jeu du pandu — Démo', demoPandu);
+        if(d==='horloge') openModal('Horloge — Chronomètre', demoHorloge);
+        if(d==='inventaire') openModal('Inventaire RPG — Démo', demoInventaire);
       });
     });
-
-    modal.addEventListener('keydown', (e)=>{ if(e.key==='Tab'){ const focusables = modal.querySelectorAll('button, input, [tabindex]'); if(focusables.length){ e.preventDefault(); focusables[0].focus(); } } });
   </script>
 </body>
 </html>
