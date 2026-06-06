@@ -1,0 +1,156 @@
+import random
+france = {
+    "ressources": 500,
+    "bonheur": 50,
+    "puissance": 100
+}
+
+belgique = {
+    "ressources": 500,
+    "bonheur": 50,
+    "puissance": 75
+}
+
+tour = 1
+evenements = 0
+
+while True:
+    chance = random.randint(1, 100)
+    if chance <= 20:
+        evenements += 1
+        print("Événement !")
+        print(f"C'est le {evenements}ᵉ événement.")
+        print("Un événement se produit !")
+        pays_event = input("Pour quel pays ? (France/Belgique) ").strip().lower()
+        if pays_event == "france":
+            france["ressources"] += 100
+            print("La France reçoit +100 ressources.")
+        elif pays_event == "belgique":
+            belgique["ressources"] += 100
+            print("La Belgique reçoit +100 ressources.")
+        else:
+            print("Pays invalide. Choisissez France ou Belgique.")
+
+    print(f"Tour {tour}")
+    print(f"Nombre d'événements : {evenements}")
+    print("1. voir les ressources de la France")
+    print("2. voir les ressources de la Belgique")
+    print("3. voir les ressources des deux pays")
+    print("4. demander a l'autre pays de partager ses ressources")
+    print("5. demander a l'autre pays de donner de la puissance")
+    print("6. faire la guerre a l'autre pays")
+    print("q. quitter")
+
+    choix = input("Entrez votre choix: ")
+    action_done = False
+    if choix == "1":
+        print("Ressources de la France:", france["ressources"])
+        print("Bonheur de la France:", france["bonheur"])
+        print("Puissance de la France:", france["puissance"])
+        action_done = True
+    elif choix == "2":
+        print("Ressources de la Belgique:", belgique["ressources"])
+        print("Bonheur de la Belgique:", belgique["bonheur"])
+        print("Puissance de la Belgique:", belgique["puissance"])
+        action_done = True
+    elif choix == "3":
+        print("France - Ressources:", france["ressources"], "Bonheur:", france["bonheur"], "Puissance:", france["puissance"])
+        print("Belgique - Ressources:", belgique["ressources"], "Bonheur:", belgique["bonheur"], "Puissance:", belgique["puissance"])
+        action_done = True
+    elif choix == "4":
+
+        donneur = input("Quel pays doit donner ses ressources ? (France/Belgique) ").strip().lower()
+        if donneur == "france":
+            if france["ressources"] >= 50:
+                france["ressources"] -= 50
+                belgique["ressources"] += 50
+                print("France -50 ressources, Belgique +50 ressources")
+            else:
+                print("La France n'a pas assez de ressources pour partager.")
+        elif donneur == "belgique":
+            if belgique["ressources"] >= 50:
+                belgique["ressources"] -= 50
+                france["ressources"] += 50
+                print("Belgique -50 ressources, France +50 ressources")
+            else:
+                print("La Belgique n'a pas assez de ressources pour partager.")
+        else:
+            print("Pays invalide. Choisissez France ou Belgique.")
+        action_done = True
+    elif choix == "5":
+        donneur_puissance = input("Quel pays doit donner de la puissance ? (France/Belgique) ").strip().lower()
+        if donneur_puissance == "france":
+            if france["puissance"] >= 50:
+                france["puissance"] -= 50
+                belgique["puissance"] += 50
+                print("France -50 puissance, Belgique +50 puissance")
+            else:
+                print("La France n'a pas assez de puissance pour donner.")
+        elif donneur_puissance == "belgique":
+            if belgique["puissance"] >= 50:
+                belgique["puissance"] -= 50
+                france["puissance"] += 50
+                print("Belgique -50 puissance, France +50 puissance")
+            else:
+                print("La Belgique n'a pas assez de puissance pour donner.")
+        else:
+            print("Pays invalide. Choisissez France ou Belgique.")
+        action_done = True
+    elif choix == "6":
+        attaquant = input("Quel pays commence la guerre ? (France/Belgique) ").strip().lower()
+        if attaquant == "france":
+            defenseur = "belgique"
+            attaquant_info = france
+            defenseur_info = belgique
+        elif attaquant == "belgique":
+            defenseur = "france"
+            attaquant_info = belgique
+            defenseur_info = france
+        else:
+            print("Pays invalide. Choisissez France ou Belgique.")
+            attaquant = None
+
+        if attaquant in ("france", "belgique"):
+            print("Vous faites la guerre.")
+            print("La guerre a commencé, le peuple est triste et les ressources descendent.")
+            if attaquant_info["puissance"] > defenseur_info["puissance"]:
+                print(f"{attaquant.capitalize()} a gagné la guerre et a pris les ressources de {defenseur.capitalize()}")
+                attaquant_info["ressources"] += defenseur_info["ressources"]
+                defenseur_info["ressources"] = 0
+                defenseur_info["bonheur"] -= 20
+            elif defenseur_info["puissance"] > attaquant_info["puissance"]:
+                print(f"{defenseur.capitalize()} a gagné la guerre et a pris les ressources de {attaquant.capitalize()}")
+                defenseur_info["ressources"] += attaquant_info["ressources"]
+                attaquant_info["ressources"] = 0
+                attaquant_info["bonheur"] -= 20
+            else:
+                print("Égalité de puissance : personne ne gagne cette fois.")
+            action_done = True
+    elif choix == "q":
+        print("Au revoir nullos !")
+        break
+    else:
+        print("Choix invalide. réessaye.")
+
+    if france["bonheur"] < 25:
+        france["ressources"] = max(0, france["ressources"] - 15)
+        print("La France perd 15 ressources car son bonheur est inférieur à 25.")
+    elif france["bonheur"] >= 75:
+        france["ressources"] += 15
+        print("La France gagne 15 ressources car son bonheur est élevé.")
+
+    if belgique["bonheur"] < 25:
+        belgique["ressources"] = max(0, belgique["ressources"] - 15)
+        print("La Belgique perd 15 ressources car son bonheur est inférieur à 25.")
+    elif belgique["bonheur"] >= 75:
+        belgique["ressources"] += 15
+        print("La Belgique gagne 15 ressources car son bonheur est élevé.")
+
+    if tour >= 20:
+        print("FIN DU JEU")
+        break
+
+    if action_done:
+        tour += 1
+
+    print()
