@@ -1,6 +1,9 @@
 import random
+import os
+
 france = {
     "ressources": 500,
+    "or": 300,
     "bonheur": 50,
     "puissance": 100,
     "intelligence": 0,
@@ -15,6 +18,7 @@ france = {
 
 belgique = {
     "ressources": 500,
+    "or": 300,
     "bonheur": 50,
     "puissance": 75,
     "intelligence": 0,
@@ -24,499 +28,265 @@ belgique = {
     "universites": 0,
     "mines": 0,
     "allie": None,
-    "demande_allie": False
+    "demande_allie": False,
+    "profil": random.choice(["Militaire", "Scientifique", "Économique"])
 }
 
 tour = 1
-evenements = 0
-prix_base = 1.0
+
+def nettoyer_ecran():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def jouer_tour_ia(ia, joueur, nom_ia, nom_joueur, prix_marche):
+    print(f"\n[IA] Tour de la Belgique ({ia['profil']})...")
+    
+    puissance_ia_reelle = ia["puissance"] + (ia["intelligence"] // 2)
+    puissance_joueur_reelle = joueur["puissance"] + (joueur["intelligence"] // 2)
+
+    seuil_guerre = 30 if ia["profil"] == "Militaire" else 60
+    if puissance_ia_reelle > puissance_joueur_reelle + seuil_guerre and ia["allie"] != nom_joueur:
+        print(f"⚠️ GUERRE : L'IA vous déclare la guerre !")
+        jet_ia = random.randint(1, 20)
+        jet_joueur = random.randint(1, 20)
+        
+        if (puissance_ia_reelle + jet_ia) > (puissance_joueur_reelle + jet_joueur):
+            pillage_res = joueur["ressources"] // 2
+            pillage_or = joueur["or"] // 2
+            print(f"❌ Victoire de l'IA ! Elle a pillé {pillage_res} ressources et {pillage_or} pièces d'or.")
+            ia["ressources"] += pillage_res; joueur["ressources"] -= pillage_res
+            ia["or"] += pillage_or; joueur["or"] -= pillage_or
+            joueur["bonheur"] = max(0, joueur["bonheur"] - 20)
+        else:
+            print(f"🎉 Vous avez repoussé l'attaque de l'IA ! Son armée bat en retraite.")
+            ia["bonheur"] = max(0, ia["bonheur"] - 15)
+        return True
+
+    if ia["profil"] == "Économique" and ia["ressources"] >= 550:
+        ia["ressources"] -= 550; ia["mines"] += 1
+        print("L'IA a construit une Mine pour booster son économie.")
+        return True
+    elif ia["profil"] == "Scientifique" and ia["ressources"] >= 350:
+        ia["ressources"] -= 350; ia["universites"] += 1
+        print("L'IA a construit une Université pour booster sa science.")
+        return True
+    elif ia["profil"] == "Militaire" and ia["ressources"] >= 250:
+        ia["ressources"] -= 250; ia["camps_militaires"] += 1
+        print("L'IA a construit un Camp militaire pour renforcer ses troupes.")
+        return True
+
+    if ia["ressources"] >= 300 and ia["fermes"] < 2:
+        ia["ressources"] -= 300; ia["fermes"] += 1
+        print("L'IA a construit une Ferme.")
+        return True
+    elif ia["ressources"] >= 400 and ia["bonheur"] < 40:
+        ia["ressources"] -= 400; ia["parcs_attraction"] += 1
+        print("L'IA a construit un Parc d'attraction.")
+        return True
+
+    if joueur["demande_allie"]:
+        chance_acceptation = 70 if ia["bonheur"] >= 50 else 40
+        if random.randint(1, 100) <= chance_acceptation:
+            ia["allie"], joueur["allie"] = nom_joueur, nom_ia
+            joueur["demande_allie"] = False
+            ia["bonheur"] += 15; joueur["bonheur"] += 15
+            print("🤝 L'IA a accepté votre demande d'alliance ! (+15 bonheur chacun)")
+        else:
+            joueur["demande_allie"] = False
+            print("❌ L'IA a décliné votre demande d'alliance.")
+        return True
+
+    print("L'IA décide d'économiser ses ressources ce tour-ci.")
+    return True
+
+nettoyer_ecran()
+print("=============================================")
+print("  BIENVENUE DANS NATIONS STRATEGY (PYTHON)   ")
+print("=============================================")
+print(f"L'IA de la Belgique a adopté un profil : {belgique['profil']}\n")
 
 while True:
-    prix_marche = round(random.uniform(0.8, 1.2), 2)
-    chance = random.randint(1, 100)
-    if chance <= 10:
-        evenements += 1
-        print("Événement !")
-        print(f"C'est le {evenements}ᵉ événement.")
+    if tour > 20 or france["ressources"] <= 0 and france["or"] <= 0 or belgique["ressources"] <= 0 and belgique["or"] <= 0:
+        print("\n=================== FIN DU JEU ===================")
+        score_france = france["ressources"] + france["or"] + (france["puissance"] * 2) + (france["intelligence"] * 3)
+        score_belgique = belgique["ressources"] + belgique["or"] + (belgique["puissance"] * 2) + (belgique["intelligence"] * 3)
         
-     
-        type_event = random.randint(1, 8)
-        pays_event = input("Pour quel pays ? (France/Belgique) ").strip().lower()
+        print(f"Score France (Vous) : {score_france} points")
+        print(f"Score Belgique (IA) : {score_belgique} points")
         
-        if pays_event == "france":
-            pays_info = france
-            nom_pays = "La France"
-        elif pays_event == "belgique":
-            pays_info = belgique
-            nom_pays = "La Belgique"
+        if score_france > score_belgique:
+            print("👑 VICTOIRE ÉCLATANTE DE LA FRANCE !")
+        elif score_france < score_belgique:
+            print("🇧🇪 VICTOIRE DE LA BELGIQUE ! L'IA vous a surpassé.")
         else:
-            print("Pays invalide. Choisissez France ou Belgique.")
-            pays_info = None
+            print("🤝 Égalité parfaite entre les deux nations.")
+        break
+
+    prix_marche = round(random.uniform(0.8, 1.5), 2)
+    
+    if random.randint(1, 100) <= 15:
+        print("\n⚡ [ÉVÉNEMENT ALÉATOIRE]")
+        pays_event = random.choice(["france", "belgique"])
+        pays_info = france if pays_event == "france" else belgique
+        nom_pays = "La France (Vous)" if pays_event == "france" else "La Belgique (IA)"
         
-        if pays_info is not None:
-            if type_event == 1:
-                
-                pays_info["puissance"] += 50
-                print(f"{nom_pays} a fait une découverte scientifique ! +50 puissance")
-            elif type_event == 2:
-                
-                pays_info["ressources"] -= 100
-                print(f"{nom_pays} subit une inondation ! -100 ressources")
-                if pays_info["ressources"] < 0:
-                    pays_info["ressources"] = 0
-            elif type_event == 3:
-                
-                pays_info["ressources"] += 100
-                print(f"{nom_pays} reçoit +100 ressources.")
-            elif type_event == 4:
-                
-                pays_info["bonheur"] -= 50
-                print(f"{nom_pays} subit une épidémie ! -50 bonheur")
-                if pays_info["bonheur"] < 0:
-                    pays_info["bonheur"] = 0
-            elif type_event == 5:
-                
-                pays_info["ressources"] += 150
-                print(f"{nom_pays} connaît une récolte exceptionnelle ! +150 ressources")
-            elif type_event == 6:
-                
-                pays_info["ressources"] -= 75
-                pays_info["bonheur"] -= 30
-                print(f"{nom_pays} subit une révolution ! -75 ressources et -30 bonheur")
-                if pays_info["ressources"] < 0:
-                    pays_info["ressources"] = 0
-                if pays_info["bonheur"] < 0:
-                    pays_info["bonheur"] = 0
-            elif type_event == 7:
-               
-                pays_info["ressources"] -= 150
-                pays_info["puissance"] -= 30
-                print(f"{nom_pays} subit un tremblement de terre ! -150 ressources et -30 puissance")
-                if pays_info["ressources"] < 0:
-                    pays_info["ressources"] = 0
-                if pays_info["puissance"] < 0:
-                    pays_info["puissance"] = 0
-            elif type_event == 8:
-              
-                pays_info["ressources"] += 75
-                pays_info["bonheur"] += 20
-                print(f"{nom_pays} signe un traité commercial ! +75 ressources et +20 bonheur")
+        type_event = random.randint(1, 4)
+        if type_event == 1:
+            pays_info["ressources"] += 150
+            print(f"⛏️ Nouveau gisement trouvé pour {nom_pays} ! +150 ressources.")
+        elif type_event == 2:
+            pays_info["ressources"] = max(0, pays_info["ressources"] - 100)
+            print(f"🌪️ Catastrophe naturelle sur {nom_pays} ! -100 ressources.")
+        elif type_event == 3:
+            pays_info["bonheur"] = max(0, pays_info["bonheur"] - 20)
+            print(f"📢 Grève générale chez {nom_pays} ! -20 bonheur.")
+        elif type_event == 4:
+            pays_info["or"] += 200
+            print(f"💰 Boom économique chez {nom_pays} ! +200 Or.")
 
-    print(f"Tour {tour}")
-    print(f"Nombre d'événements : {evenements}")
-    print(f"Prix du marché : {prix_marche} (etat du marché basé sur {prix_base})")
-    print("1. voir les ressources des deux pays")
-    print("2. voir les bâtiments des deux pays")
-    print("3. voir l'intelligence des deux pays")
-    print("4. voir la puissance des deux pays")
-    print("5. voir le bonheur des deux pays")
-    print("6. voir les alliances des deux pays")
-    print("7. demander a l'autre pays de partager ses ressources")
-    print("8. demander a l'autre pays de donner de la puissance")
-    print("9. faire la guerre a l'autre pays")
-    print("10. construire un bâtiment")
-    print("11. faire du commerce (acheter/vendre)")
-    print("12. gérer les alliances")
-    print("q. quitter")
+    print(f"\n--- Tour {tour} / 20 ---")
+    print(f"📈 Prix actuel du marché : 1 Ressource = {prix_marche} Or")
+    print("1. 👀 Voir l'état des deux pays")
+    print("2. ✋ Demander de l'Or à l'IA")
+    print("3. ⚔️ Faire la guerre à l'IA")
+    print("4. 🏗️ Construire un bâtiment")
+    print("5. 💱 Faire du commerce (Marché Or/Ressources)")
+    print("6. 🤝 Proposer une Alliance")
+    print("7. 💤 Passer son tour")
+    print("q. 🛑 Quitter le jeu")
 
-    choix = input("Entrez votre choix: ")
-    action_done = False
+    choix = input("Votre action : ").strip().lower()
+    action_joueur_faite = False
+
     if choix == "1":
-        print("France - Ressources:", france["ressources"], "Bonheur:", france["bonheur"], "Puissance:", france["puissance"], "Intelligence:", france["intelligence"], "Bâtiments:", france["fermes"], "fermes,", france["camps_militaires"], "camps militaires,", france["parcs_attraction"], "parcs d'attraction,", france["universites"], "universités,", france["mines"], "mines")
-        print("Belgique - Ressources:", belgique["ressources"], "Bonheur:", belgique["bonheur"], "Puissance:", belgique["puissance"], "Intelligence:", belgique["intelligence"], "Bâtiments:", belgique["fermes"], "fermes,", belgique["camps_militaires"], "camps militaires,", belgique["parcs_attraction"], "parcs d'attraction,", belgique["universites"], "universités,", belgique["mines"], "mines")
-        action_done = True
+        print(f"\n[VOUS] France   -> Ressources: {france['ressources']} | Or: {france['or']} | Bonheur: {france['bonheur']}% | Puissance: {france['puissance']} | Intelligence: {france['intelligence']}\n        Bâtiments: Fermes({france['fermes']}) Mines({france['mines']}) Camps({france['camps_militaires']}) Parcs({france['parcs_attraction']}) Universités({france['universites']})")
+        print(f"[IA]   Belgique -> Ressources: {belgique['ressources']} | Or: {belgique['or']} | Bonheur: {belgique['bonheur']}% | Puissance: {belgique['puissance']} | Intelligence: {belgique['intelligence']}\n        Bâtiments: Fermes({belgique['fermes']}) Mines({belgique['mines']}) Camps({belgique['camps_militaires']}) Parcs({belgique['parcs_attraction']}) Universités({belgique['universites']})")
+        print(f"🔗 Alliance active : {france['allie'] if france['allie'] else 'Aucune'}")
+        input("\nAppuyez sur Entrée pour continuer...")
+        continue
+        
     elif choix == "2":
-        print("France - Bâtiments:", france["fermes"], "fermes,", france["camps_militaires"], "camps militaires,", france["parcs_attraction"], "parcs d'attraction,", france["universites"], "universités,", france["mines"], "mines")
-        print("Belgique - Bâtiments:", belgique["fermes"], "fermes,", belgique["camps_militaires"], "camps militaires,", belgique["parcs_attraction"], "parcs d'attraction,", belgique["universites"], "universités,", belgique["mines"], "mines")
-        action_done = True
+        if belgique["or"] >= 100:
+            if france["allie"] == "belgique" and random.randint(1, 2) == 1:
+                belgique["or"] -= 100; france["or"] += 100
+                print("💰 Votre allié belge accepte de vous soutenir et vous donne 100 Or !")
+            else:
+                print("❌ L'IA refuse de vous donner de l'argent. Elle garde ses fonds ou vous n'êtes pas alliés.")
+        else:
+            print("L'IA est trop pauvre pour vous aider.")
+        action_joueur_faite = True
+
     elif choix == "3":
-        print("France - Intelligence:", france["intelligence"])
-        print("Belgique - Intelligence:", belgique["intelligence"])
-        action_done = True
-    elif choix == "4":
-        print("France - Puissance:", france["puissance"])
-        print("Belgique - Puissance:", belgique["puissance"])
-        action_done = True
-    elif choix == "5":
-        print("France - Bonheur:", france["bonheur"])
-        print("Belgique - Bonheur:", belgique["bonheur"])
-        action_done = True
-    elif choix == "6":
-        print("France - Alliances:", france["alliances"])
-        print("Belgique - Alliances:", belgique["alliances"])
-        action_done = True
-    elif choix == "7":
-
-        donneur = input("Quel pays doit donner ses ressources ? (France/Belgique) ").strip().lower()
-        if donneur == "france":
-            if france["ressources"] >= 50:
-                if random.randint(1, 3) == 1:
-                    print("France refuse de partager ses ressources.")
-                else:
-                    france["ressources"] -= 50
-                    belgique["ressources"] += 50
-                    print("France -50 ressources, Belgique +50 ressources")
-            else:
-                print("La France n'a pas assez de ressources pour partager.")
-        elif donneur == "belgique":
-            if belgique["ressources"] >= 50:
-                if random.randint(1, 3) == 1:
-                    print("Belgique refuse de partager ses ressources.")
-                else:
-                    belgique["ressources"] -= 50
-                    france["ressources"] += 50
-                    print("Belgique -50 ressources, France +50 ressources")
-            else:
-                print("La Belgique n'a pas assez de ressources pour partager.")
+        if france["allie"] == "belgique":
+            print("Vous êtes alliés ! Trahir une alliance est impossible dans cette version.")
         else:
-            print("Pays invalide. Choisissez France ou Belgique.")
-        action_done = True
-    elif choix == "5":
-        donneur_puissance = input("Quel pays doit donner de la puissance ? (France/Belgique) ").strip().lower()
-        if donneur_puissance == "france":
-            if france["puissance"] >= 50:
-                if random.randint(1, 3) == 1:
-                    print("France refuse de donner sa puissance.")
-                else:
-                    france["puissance"] -= 50
-                    belgique["puissance"] += 50
-                    print("France -50 puissance, Belgique +50 puissance")
-            else:
-                print("La France n'a pas assez de puissance pour donner.")
-        elif donneur_puissance == "belgique":
-            if belgique["puissance"] >= 50:
-                if random.randint(1, 3) == 1:
-                    print("Belgique refuse de donner sa puissance.")
-                else:
-                    belgique["puissance"] -= 50
-                    france["puissance"] += 50
-                    print("Belgique -50 puissance, France +50 puissance")
-            else:
-                print("La Belgique n'a pas assez de puissance pour donner.")
-        else:
-            print("Pays invalide. Choisissez France ou Belgique.")
-        action_done = True
-    elif choix == "6":
-        attaquant = input("Quel pays commence la guerre ? (France/Belgique) ").strip().lower()
-        if attaquant == "france":
-            defenseur = "belgique"
-            attaquant_info = france
-            defenseur_info = belgique
-        elif attaquant == "belgique":
-            defenseur = "france"
-            attaquant_info = belgique
-            defenseur_info = france
-        else:
-            print("Pays invalide. Choisissez France ou Belgique.")
-            attaquant = None
-
-        if attaquant in ("france", "belgique"):
-            # Vérifier si ce sont des alliés
-            if france["allie"] == "belgique" and belgique["allie"] == "france":
-                print("❌ Les pays alliés ne peuvent pas se faire la guerre !")
-            else:
-                print("Vous faites la guerre.")
-                print("La guerre a commencé, le peuple est triste et les ressources descendent.")
-                puissance_attaquant = attaquant_info["puissance"] + (attaquant_info["intelligence"] // 2)
-                puissance_defenseur = defenseur_info["puissance"] + (defenseur_info["intelligence"] // 2)
-                if puissance_attaquant > puissance_defenseur:
-                    print(f"{attaquant.capitalize()} a gagné la guerre et a pris les ressources de {defenseur.capitalize()}")
-                    attaquant_info["ressources"] += defenseur_info["ressources"]
-                    defenseur_info["ressources"] = 0
-                    defenseur_info["bonheur"] -= 20
-                elif puissance_defenseur > puissance_attaquant:
-                    print(f"{defenseur.capitalize()} a gagné la guerre et a pris les ressources de {attaquant.capitalize()}")
-                    defenseur_info["ressources"] += attaquant_info["ressources"]
-                    attaquant_info["ressources"] = 0
-                    attaquant_info["bonheur"] -= 20
-                else:
-                    print("Égalité de puissance : personne ne gagne cette fois.")
-                action_done = True
-    elif choix == "8":
-        pays_commerce = input("Quel pays fait du commerce ? (France/Belgique) ").strip().lower()
-        if pays_commerce == "france":
-            acheteur_info = france
-            vendeur_info = belgique
-            acheteur_nom = "France"
-            vendeur_nom = "Belgique"
-        elif pays_commerce == "belgique":
-            acheteur_info = belgique
-            vendeur_info = france
-            acheteur_nom = "Belgique"
-            vendeur_nom = "France"
-        else:
-            print("Pays invalide. Choisissez France ou Belgique.")
-            acheteur_info = None
-        
-        if acheteur_info is not None:
-            print(f"\nPrix de vente par ressource : {prix_marche:.2f} (calculé sur la base {prix_base})")
-            print(f"{acheteur_nom} a {acheteur_info['ressources']} ressources")
-            print(f"{vendeur_nom} a {vendeur_info['ressources']} ressources")
+            print("⚔️ Vous lancez l'assaut !")
+            p_j = france["puissance"] + (france["intelligence"] // 2)
+            p_ia = belgique["puissance"] + (belgique["intelligence"] // 2)
             
-            action = input("Veux-tu acheter (a) ou vendre (v) des ressources ? ").strip().lower()
-            if action == "a":
-                try:
-                    quantite = int(input(f"Combien de ressources veux-tu acheter ? (coût: 1 ressource = {prix_marche:.2f}) "))
-                    cout = int(quantite * prix_marche)
-                    if vendeur_info["ressources"] >= quantite:
-                        if acheteur_info["ressources"] >= cout:
-                            acheteur_info["ressources"] -= cout
-                            vendeur_info["ressources"] -= quantite
-                            vendeur_info["ressources"] += cout
-                            print(f"{acheteur_nom} a acheté {quantite} ressources pour {cout} ressources.")
-                            print(f"{vendeur_nom} a gagné {cout} ressources.")
-                            action_done = True
-                        else:
-                            print(f"{acheteur_nom} n'a pas assez de ressources pour acheter.")
-                    else:
-                        print(f"{vendeur_nom} n'a pas assez de ressources à vendre.")
-                except ValueError:
-                    print("Quantité invalide.")
-            elif action == "v":
-                try:
-                    quantite = int(input(f"Combien de ressources veux-tu vendre ? (tu recevras: 1 ressource = {prix_marche:.2f}) "))
-                    gain = int(quantite * prix_marche)
-                    if acheteur_info["ressources"] >= quantite:
-                        if vendeur_info["ressources"] >= gain:
-                            vendeur_info["ressources"] -= gain
-                            acheteur_info["ressources"] -= quantite
-                            acheteur_info["ressources"] += gain
-                            print(f"{acheteur_nom} a acheté {quantite} ressources pour {gain} ressources.")
-                            print(f"{vendeur_nom} a reçu {gain} ressources.")
-                            action_done = True
-                        else:
-                            print(f"{vendeur_nom} n'a pas assez de ressources.")
-                    else:
-                        print(f"{acheteur_nom} n'a pas assez de ressources à acheter.")
-                except ValueError:
-                    print("Quantité invalide.")
+            jet_joueur = random.randint(1, 25)
+            jet_ia = random.randint(1, 25)
+            
+            if (p_j + jet_joueur) > (p_ia + jet_ia):
+                pillage = belgique["ressources"] // 2
+                print(f"🎉 Victoire ! Vos armées écrasent la Belgique et pillent {pillage} ressources.")
+                france["ressources"] += pillage; belgique["ressources"] -= pillage
+                belgique["bonheur"] = max(0, belgique["bonheur"] - 20)
             else:
-                print("Action invalide.")
-    elif choix == "9":
-        print("\n--- Gestion des Alliances ---")
-        print(f"France - Allié avec : {france['allie'] if france['allie'] else 'Personne'}")
-        print(f"Belgique - Allié avec : {belgique['allie'] if belgique['allie'] else 'Personne'}")
-        
-        if france["demande_allie"] or belgique["demande_allie"]:
-            print("\n⚠️  Il y a une demande d'alliance en attente !")
-        
-        action_allie = input("\nQue faire ? (proposer/accepter/refuser/rompre) ").strip().lower()
-        
-        if action_allie == "proposer":
-            initiateur = input("Quel pays propose ? (France/Belgique) ").strip().lower()
-            if initiateur == "france":
-                france["demande_allie"] = True
-                print("France propose une alliance à la Belgique !")
-                action_done = True
-            elif initiateur == "belgique":
-                belgique["demande_allie"] = True
-                print("Belgique propose une alliance à la France !")
-                action_done = True
-            else:
-                print("Pays invalide.")
-        
-        elif action_allie == "accepter":
-            accepteur = input("Quel pays accepte ? (France/Belgique) ").strip().lower()
-            if accepteur == "france":
-                if belgique["demande_allie"]:
-                    france["allie"] = "belgique"
-                    belgique["allie"] = "france"
-                    belgique["demande_allie"] = False
-                    france["bonheur"] += 15
-                    belgique["bonheur"] += 15
-                    print("✅ France et Belgique sont maintenant alliés ! +15 bonheur chacun")
-                    action_done = True
-                else:
-                    print("Belgique n'a pas proposé d'alliance.")
-            elif accepteur == "belgique":
-                if france["demande_allie"]:
-                    belgique["allie"] = "france"
-                    france["allie"] = "belgique"
-                    france["demande_allie"] = False
-                    france["bonheur"] += 15
-                    belgique["bonheur"] += 15
-                    print("✅ France et Belgique sont maintenant alliés ! +15 bonheur chacun")
-                    action_done = True
-                else:
-                    print("France n'a pas proposé d'alliance.")
-            else:
-                print("Pays invalide.")
-        
-        elif action_allie == "refuser":
-            refuseur = input("Quel pays refuse ? (France/Belgique) ").strip().lower()
-            if refuseur == "france":
-                if belgique["demande_allie"]:
-                    belgique["demande_allie"] = False
-                    print("❌ France a rejeté la demande d'alliance de Belgique.")
-                    action_done = True
-                else:
-                    print("Il n'y a pas de demande d'alliance à refuser pour la France.")
-            elif refuseur == "belgique":
-                if france["demande_allie"]:
-                    france["demande_allie"] = False
-                    print("❌ Belgique a rejeté la demande d'alliance de France.")
-                    action_done = True
-                else:
-                    print("Il n'y a pas de demande d'alliance à refuser pour la Belgique.")
-            else:
-                print("Pays invalide.")
-        
-        elif action_allie == "rompre":
-            pays_rupture = input("Quel pays rompt l'alliance ? (France/Belgique) ").strip().lower()
-            if pays_rupture == "france":
-                if france["allie"] == "belgique":
-                    france["allie"] = None
-                    belgique["allie"] = None
-                    france["bonheur"] -= 10
-                    belgique["bonheur"] -= 10
-                    print("❌ France et Belgique ne sont plus alliés. -10 bonheur chacun")
-                    action_done = True
-                else:
-                    print("France n'est allié avec personne.")
-            elif pays_rupture == "belgique":
-                if belgique["allie"] == "france":
-                    belgique["allie"] = None
-                    france["allie"] = None
-                    belgique["bonheur"] -= 10
-                    france["bonheur"] -= 10
-                    print("❌ France et Belgique ne sont plus alliés. -10 bonheur chacun")
-                    action_done = True
-                else:
-                    print("Belgique n'est allié avec personne.")
-            else:
-                print("Pays invalide.")
-        else:
-            print("Action invalide.")
-    elif choix == "7":
-        pays_build = input("Pour quel pays construire ? (France/Belgique) ").strip().lower()
-        if pays_build == "france":
-            pays_info = france
-        elif pays_build == "belgique":
-            pays_info = belgique
-        else:
-            print("Pays invalide. Choisissez France ou Belgique.")
-            pays_info = None
+                pillage = france["ressources"] // 3
+                print(f"💥 Échec sanglant ! L'IA repousse vos assauts et contre-attaque. Vous perdez {pillage} ressources.")
+                belgique["ressources"] += pillage; france["ressources"] -= pillage
+                france["bonheur"] = max(0, france["bonheur"] - 20)
+            action_joueur_faite = True
 
-        if pays_info is not None:
-            print("0. Annuler")
-            print("1. Ferme (30 ressources par tour) - coût 300 ressources, 15 bonheur, 20 puissance")
-            print("2. Camp militaire (+20 puissance par tour) - coût 250 ressources, 25 bonheur, 30 puissance")
-            print("3. Parc d'attraction (+25 bonheur par tour) - coût 400 ressources, 25 bonheur, 15 puissance")
-            print("4. Université (+30 intelligence par tour) - coût 350 ressources, 10 bonheur, 30 puissance")
-            print("5. Mine (+50 ressources par tour) - coût 550 ressources, 20 bonheur, 40 puissance")
-            choix_build = input("Quel bâtiment construire ? ")
-            if choix_build == "1":
-                if pays_info["ressources"] >= 300 and pays_info["bonheur"] >= 15 and pays_info["puissance"] >= 20:
-                    pays_info["ressources"] -= 300
-                    pays_info["bonheur"] -= 15
-                    pays_info["puissance"] -= 20
-                    pays_info["fermes"] += 1
-                    print("Une ferme a été construite. Elle produira +30 ressources chaque tour.")
-                    action_done = True
-                else:
-                    print("Pas assez de ressources, de bonheur ou de puissance pour construire une ferme.")
-            elif choix_build == "2":
-                if pays_info["ressources"] >= 250 and pays_info["bonheur"] >= 25 and pays_info["puissance"] >= 30:
-                    pays_info["ressources"] -= 250
-                    pays_info["bonheur"] -= 25
-                    pays_info["puissance"] -= 30
-                    pays_info["camps_militaires"] += 1
-                    print("Un camp militaire a été construit. Il produira +20 puissance chaque tour.")
-                    action_done = True
-                else:
-                    print("Pas assez de ressources, de bonheur ou de puissance pour construire un camp militaire.")
-            elif choix_build == "3":
-                if pays_info["ressources"] >= 400 and pays_info["bonheur"] >= 25 and pays_info["puissance"] >= 15:
-                    pays_info["ressources"] -= 400
-                    pays_info["bonheur"] -= 25
-                    pays_info["puissance"] -= 15
-                    pays_info["parcs_attraction"] += 1
-                    print("Un parc d'attraction a été construit. Il produira +25 bonheur chaque tour.")
-                    action_done = True
-            elif choix_build == "4":
-                if pays_info["ressources"] >= 350 and pays_info["bonheur"] >= 10 and pays_info["puissance"] >= 30:
-                    pays_info["ressources"] -= 350
-                    pays_info["bonheur"] -= 10
-                    pays_info["puissance"] -= 30
-                    pays_info["universites"] += 1
-                    print("Une université a été construite. Elle produira +30 intelligence chaque tour.")
-                    action_done = True
-                else:
-                    print("Pas assez de ressources, de bonheur ou de puissance pour construire une université.")
-            elif choix_build == "5":
-                if pays_info["ressources"] >= 550 and pays_info["bonheur"] >= 20 and pays_info["puissance"] >= 40:
-                    pays_info["ressources"] -= 550
-                    pays_info["bonheur"] -= 20
-                    pays_info["puissance"] -= 40
-                    pays_info["mines"] += 1
-                    print("Une mine a été construite. Elle produira +50 ressources chaque tour.")
-                    action_done = True
-                else:
-                    print("Pas assez de ressources, de bonheur ou de puissance pour construire une mine.")
-            elif choix_build == "0":
-                print("Construction annulée.")
+    elif choix == "4":
+        print(f"\nVos ressources actuelles : {france['ressources']}")
+        print("1. Ferme (300 res) | 2. Camp militaire (250 res) | 3. Parc d'attraction (400 res) | 4. Université (350 res) | 5. Mine (550 res)")
+        bat = input("Quel bâtiment voulez-vous construire ? ")
+        if bat == "1" and france["ressources"] >= 300:
+            france["ressources"] -= 300; france["fermes"] += 1; print("Ferme construite !"); action_joueur_faite = True
+        elif bat == "2" and france["ressources"] >= 250:
+            france["ressources"] -= 250; france["camps_militaires"] += 1; print("Camp militaire construit !"); action_joueur_faite = True
+        elif bat == "3" and france["ressources"] >= 400:
+            france["ressources"] -= 400; france["parcs_attraction"] += 1; print("Parc d'attraction construit !"); action_joueur_faite = True
+        elif bat == "4" and france["ressources"] >= 350:
+            france["ressources"] -= 350; france["universites"] += 1; print("Université construite !"); action_joueur_faite = True
+        elif bat == "5" and france["ressources"] >= 550:
+            france["ressources"] -= 550; france["mines"] += 1; print("Mine construite !"); action_joueur_faite = True
+        else:
+            print("Ressources insuffisantes ou mauvais choix.")
+
+    elif choix == "5":
+        act = input("Voulez-vous Acheter des ressources (a) ou Vendre vos ressources (v) ? ").lower()
+        qty = int(input("Quelle quantité de ressources ? "))
+        cout_or = int(qty * prix_marche)
+        
+        if act == "a":
+            if france["or"] >= cout_or and belgique["ressources"] >= qty:
+                france["or"] -= cout_or; france["ressources"] += qty
+                belgique["or"] += cout_or; belgique["ressources"] -= qty
+                print(f"🛒 Achat réussi ! Vous avez payé {cout_or} Or pour {qty} ressources."); action_joueur_faite = True
             else:
-                print("Choix de bâtiment invalide.")
+                print("Transaction impossible : Pas assez d'Or ou l'IA n'a pas assez de ressources.")
+        elif act == "v":
+            if france["ressources"] >= qty and belgique["or"] >= cout_or:
+                france["ressources"] -= qty; france["or"] += cout_or
+                belgique["ressources"] += qty; belgique["or"] -= cout_or
+                print(f"💰 Vente réussie ! Vous avez vendu {qty} ressources pour {cout_or} Or."); action_joueur_faite = True
+            else:
+                print("Transaction impossible : Vous manquez de ressources ou l'IA n'a plus d'Or.")
+
+    elif choix == "6":
+        if france["allie"] is not None:
+            print("Vous êtes déjà alliés.")
+        else:
+            france["demande_allie"] = True
+            print("Demande d'alliance envoyée à la Belgique.")
+            action_joueur_faite = True
+
+    elif choix == "7":
+        print("Vous passez votre tour pour accumuler vos bonus.")
+        action_joueur_faite = True
+
     elif choix == "q":
-        print("Au revoir nullos !")
+        print("Merci d'avoir joué !")
         break
     else:
-        print("Choix invalide. réessaye.")
+        print("Choix invalide.")
 
-    if france["bonheur"] < 25:
-        france["ressources"] = max(0, france["ressources"] - 15)
-        print("La France perd 15 ressources car son bonheur est inférieur à 25.")
-    elif france["bonheur"] >= 75:
-        france["ressources"] += 15
-        print("La France gagne 15 ressources car son bonheur est élevé.")
+    if action_joueur_faite:
+        jouer_tour_ia(belgique, france, "belgique", "france", prix_marche)
 
-    if belgique["bonheur"] < 25:
-        belgique["ressources"] = max(0, belgique["ressources"] - 15)
-        print("La Belgique perd 15 ressources car son bonheur est inférieur à 25.")
-    elif belgique["bonheur"] >= 75:
-        belgique["ressources"] += 15
-        print("La Belgique gagne 15 ressources car son bonheur est élevé.")
+        for pays in [france, belgique]:
+            if pays["bonheur"] < 25: 
+                pays["ressources"] = max(0, pays["ressources"] - 20)
+                print("📉 Faible bonheur : Des ouvriers font grève (perte de ressources).")
+            elif pays["bonheur"] >= 75: 
+                pays["ressources"] += 20
+                print("📈 Bonheur élevé : Productivité en hausse ! (+20 ressources).")
+            
+            coût_maintenance = (pays["camps_militaires"] * 5) + (pays["universites"] * 5)
+            pays["or"] = max(0, pays["or"] - coût_maintenance)
 
-    if france["fermes"] > 0 or france["camps_militaires"] > 0 or france["parcs_attraction"] > 0 or france["universites"] > 0 or france["mines"] > 0:
-        bonus_ressources = france["fermes"] * 30 + france["mines"] * 50
-        bonus_puissance = france["camps_militaires"] * 20
-        bonus_bonheur = france["parcs_attraction"] * 25
-        bonus_intelligence = france["universites"] * 30
-        bonus_ressources += (france["intelligence"] // 10)
-        france["ressources"] += bonus_ressources
-        france["puissance"] += bonus_puissance
-        france["bonheur"] += bonus_bonheur
-        france["intelligence"] += bonus_intelligence
-        print(f"France reçoit +{bonus_ressources} ressources, +{bonus_puissance} puissance, +{bonus_bonheur} bonheur, +{bonus_intelligence} intelligence grâce à ses bâtiments.")
+        for pays, nom in [(france, "La France"), (belgique, "L'IA")]:
+            if pays["fermes"] > 0 or pays["camps_militaires"] > 0 or pays["parcs_attraction"] > 0 or pays["universites"] > 0 or pays["mines"] > 0:
+                b_res = (pays["fermes"] * 35) + (pays["mines"] * 60)
+                b_pui = pays["camps_militaires"] * 15
+                b_bon = pays["parcs_attraction"] * 10
+                b_int = pays["universites"] * 20
+                
+                pays["ressources"] += b_res
+                pays["puissance"] += b_pui
+                pays["bonheur"] = min(100, pays["bonheur"] + b_bon)
+                pays["intelligence"] += b_int
+                print(f"🏭 Production {nom} : +{b_res} Res | +{b_pui} Puiss | +{b_bon} Bonheur | +{b_int} Intel")
 
-    if belgique["fermes"] > 0 or belgique["camps_militaires"] > 0 or belgique["parcs_attraction"] > 0 or belgique["universites"] > 0 or belgique["mines"] > 0:
-        bonus_ressources = belgique["fermes"] * 30 + belgique["mines"] * 50
-        bonus_puissance = belgique["camps_militaires"] * 20
-        bonus_bonheur = belgique["parcs_attraction"] * 25
-        bonus_intelligence = belgique["universites"] * 30
-        bonus_ressources += (belgique["intelligence"] // 10)
-        belgique["ressources"] += bonus_ressources
-        belgique["puissance"] += bonus_puissance
-        belgique["bonheur"] += bonus_bonheur
-        belgique["intelligence"] += bonus_intelligence
-        print(f"Belgique reçoit +{bonus_ressources} ressources, +{bonus_puissance} puissance, +{bonus_bonheur} bonheur, +{bonus_intelligence} intelligence grâce à ses bâtiments.")
+        if france["allie"] == "belgique":
+            france["ressources"] += 30
+            belgique["ressources"] += 30
+            france["or"] += 10
+            belgique["or"] += 10
+            print("🤝 Bonus de Coopération de l'Alliance : +30 ressources et +10 Or chacun.")
 
-
-    if france["allie"] == "belgique" and belgique["allie"] == "france":
-        
-        partage = 20
-        france["ressources"] += partage
-        belgique["ressources"] += partage
-        print(f"🤝 Bonus d'alliance ! France et Belgique partagent {partage} ressources chacun.")
-
-    if tour >= 20:
-        print("FIN DU JEU")
-        break
-
-    if action_done: 
         tour += 1
-    
-        prix_marche = round(prix_marche + random.uniform(-0.1, 0.1), 2)
-        prix_marche = max(0.5, min(1.5, prix_marche))
-
-    print()
+        input("\nFin du tour. Appuyez sur Entrée pour passer au tour suivant...")
+        nettoyer_ecran()
