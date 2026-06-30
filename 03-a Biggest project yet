@@ -100,7 +100,7 @@ def jouer_tour_ia(ia, joueur, nom_ia, nom_joueur, prix_marche):
 
 nettoyer_ecran()
 print("=============================================")
-print("  BIENVENUE DANS NATIONS STRATEGY (PYTHON)   ")
+print("  Mini jeu par Urtiaga   ")
 print("=============================================")
 print(f"L'IA de la Belgique a adopté un profil : {belgique['profil']}\n")
 
@@ -248,7 +248,7 @@ while True:
         action_joueur_faite = True
 
     elif choix == "q":
-        print("Merci d'avoir joué !")
+        print("Honte a toi pauvre fou !")
         break
     else:
         print("Choix invalide.")
