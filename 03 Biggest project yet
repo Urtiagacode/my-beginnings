@@ -13,7 +13,10 @@ france = {
     "universites": 0,
     "mines": 0,
     "allie": None,
-    "demande_allie": False
+    "demande_allie": False,
+    "budget": 150,
+    "taux_imposition": 15,
+    "population": 120
 }
 
 belgique = {
@@ -29,13 +32,62 @@ belgique = {
     "mines": 0,
     "allie": None,
     "demande_allie": False,
-    "profil": random.choice(["Militaire", "Scientifique", "Économique"])
+    "profil": random.choice(["Militaire", "Scientifique", "Économique"]),
+    "budget": 150,
+    "taux_imposition": 15,
+    "population": 110
 }
 
 tour = 1
 
 def nettoyer_ecran():
     os.system('cls' if os.name == 'nt' else 'clear')
+
+def appliquer_economie(pays, nom_pays):
+    revenu_base = (pays["fermes"] * 20) + (pays["mines"] * 35) + (pays["parcs_attraction"] * 10) + (pays["universites"] * 20) + (pays["camps_militaires"] * 8)
+    revenu_base += pays["population"] // 10
+
+    if pays["bonheur"] >= 75:
+        revenu_base += 15
+    elif pays["bonheur"] < 35:
+        revenu_base = max(0, revenu_base - 10)
+
+    taxe_recue = int(revenu_base * (pays["taux_imposition"] / 100))
+    ressources_recu = max(0, revenu_base - taxe_recue)
+
+    pays["or"] += taxe_recue
+    pays["ressources"] += ressources_recu
+    pays["budget"] += taxe_recue
+
+    if pays["taux_imposition"] >= 25:
+        pays["bonheur"] = max(0, pays["bonheur"] - 2)
+    elif pays["taux_imposition"] <= 10:
+        pays["bonheur"] = min(100, pays["bonheur"] + 2)
+
+    print(f"💼 Économie de {nom_pays} : +{taxe_recue} € et +{ressources_recu} ressources.")
+
+def appliquer_population(pays, nom_pays):
+    croissance = 0
+    if pays["bonheur"] >= 70:
+        croissance += 4
+    elif pays["bonheur"] < 30:
+        croissance -= 3
+
+    if pays["fermes"] > 0:
+        croissance += 2
+    if pays["parcs_attraction"] > 0:
+        croissance += 1
+    if pays["camps_militaires"] > 0 and pays["bonheur"] < 50:
+        croissance -= 1
+
+    nouvelle_population = max(50, min(500, pays["population"] + croissance))
+    if nouvelle_population != pays["population"]:
+        pays["population"] = nouvelle_population
+        if croissance > 0:
+            print(f"👨‍👩‍👧‍👦 Population de {nom_pays} en hausse : {pays['population']} habitants.")
+        else:
+            print(f"👥 Population de {nom_pays} en baisse : {pays['population']} habitants.")
+
 
 def jouer_tour_ia(ia, joueur, nom_ia, nom_joueur, prix_marche):
     print(f"\n[IA] Tour de la Belgique ({ia['profil']})...")
@@ -52,7 +104,7 @@ def jouer_tour_ia(ia, joueur, nom_ia, nom_joueur, prix_marche):
         if (puissance_ia_reelle + jet_ia) > (puissance_joueur_reelle + jet_joueur):
             pillage_res = joueur["ressources"] // 2
             pillage_or = joueur["or"] // 2
-            print(f"❌ Victoire de l'IA ! Elle a pillé {pillage_res} ressources et {pillage_or} pièces d'or.")
+            print(f"❌ Victoire de l'IA ! Elle a pillé {pillage_res} ressources et {pillage_or} €.")
             ia["ressources"] += pillage_res; joueur["ressources"] -= pillage_res
             ia["or"] += pillage_or; joueur["or"] -= pillage_or
             joueur["bonheur"] = max(0, joueur["bonheur"] - 20)
@@ -141,25 +193,38 @@ while True:
             print(f"📢 Grève générale chez {nom_pays} ! -20 bonheur.")
         elif type_event == 4:
             pays_info["or"] += 200
-            print(f"💰 Boom économique chez {nom_pays} ! +200 Or.")
+            print(f"💰 Boom économique chez {nom_pays} ! +200 €.")
 
     print(f"\n--- Tour {tour} / 20 ---")
-    print(f"📈 Prix actuel du marché : 1 Ressource = {prix_marche} Or")
+    print(f"📈 Prix actuel du marché : 1 Ressource = {prix_marche} €")
     print("1. 👀 Voir l'état des deux pays")
-    print("2. ✋ Demander de l'Or à l'IA")
+    print()
+    print("2. ✋ Demander des € à l'IA")
+    print()
     print("3. ⚔️ Faire la guerre à l'IA")
+    print()
     print("4. 🏗️ Construire un bâtiment")
-    print("5. 💱 Faire du commerce (Marché Or/Ressources)")
+    print()
+    print("5. 💱 Faire du commerce (Marché € / Ressources)")
+    print()
     print("6. 🤝 Proposer une Alliance")
+    print()
     print("7. 💤 Passer son tour")
+    print()
+    print("8. 💼 Gérer l'économie")
+    print()
+    print("9. 🏠 Investir dans la population")
+    print()
     print("q. 🛑 Quitter le jeu")
 
     choix = input("Votre action : ").strip().lower()
     action_joueur_faite = False
 
     if choix == "1":
-        print(f"\n[VOUS] France   -> Ressources: {france['ressources']} | Or: {france['or']} | Bonheur: {france['bonheur']}% | Puissance: {france['puissance']} | Intelligence: {france['intelligence']}\n        Bâtiments: Fermes({france['fermes']}) Mines({france['mines']}) Camps({france['camps_militaires']}) Parcs({france['parcs_attraction']}) Universités({france['universites']})")
-        print(f"[IA]   Belgique -> Ressources: {belgique['ressources']} | Or: {belgique['or']} | Bonheur: {belgique['bonheur']}% | Puissance: {belgique['puissance']} | Intelligence: {belgique['intelligence']}\n        Bâtiments: Fermes({belgique['fermes']}) Mines({belgique['mines']}) Camps({belgique['camps_militaires']}) Parcs({belgique['parcs_attraction']}) Universités({belgique['universites']})")
+        print(f"\n[VOUS] France   -> Ressources: {france['ressources']} | €: {france['or']} | Bonheur: {france['bonheur']}% | Puissance: {france['puissance']} | Intelligence: {france['intelligence']} | Population: {france['population']} | Budget: {france['budget']} | Taxes: {france['taux_imposition']}%")
+        print(f"        Bâtiments: Fermes({france['fermes']}) Mines({france['mines']}) Camps({france['camps_militaires']}) Parcs({france['parcs_attraction']}) Universités({france['universites']})")
+        print(f"[IA]   Belgique -> Ressources: {belgique['ressources']} | €: {belgique['or']} | Bonheur: {belgique['bonheur']}% | Puissance: {belgique['puissance']} | Intelligence: {belgique['intelligence']} | Population: {belgique['population']} | Budget: {belgique['budget']} | Taxes: {belgique['taux_imposition']}%")
+        print(f"        Bâtiments: Fermes({belgique['fermes']}) Mines({belgique['mines']}) Camps({belgique['camps_militaires']}) Parcs({belgique['parcs_attraction']}) Universités({belgique['universites']})")
         print(f"🔗 Alliance active : {france['allie'] if france['allie'] else 'Aucune'}")
         input("\nAppuyez sur Entrée pour continuer...")
         continue
@@ -168,7 +233,7 @@ while True:
         if belgique["or"] >= 100:
             if france["allie"] == "belgique" and random.randint(1, 2) == 1:
                 belgique["or"] -= 100; france["or"] += 100
-                print("💰 Votre allié belge accepte de vous soutenir et vous donne 100 Or !")
+                print("💰 Votre allié belge accepte de vous soutenir et vous donne 100 € !")
             else:
                 print("❌ L'IA refuse de vous donner de l'argent. Elle garde ses fonds ou vous n'êtes pas alliés.")
         else:
@@ -224,16 +289,16 @@ while True:
             if france["or"] >= cout_or and belgique["ressources"] >= qty:
                 france["or"] -= cout_or; france["ressources"] += qty
                 belgique["or"] += cout_or; belgique["ressources"] -= qty
-                print(f"🛒 Achat réussi ! Vous avez payé {cout_or} Or pour {qty} ressources."); action_joueur_faite = True
+                print(f"🛒 Achat réussi ! Vous avez payé {cout_or} € pour {qty} ressources."); action_joueur_faite = True
             else:
-                print("Transaction impossible : Pas assez d'Or ou l'IA n'a pas assez de ressources.")
+                print("Transaction impossible : Pas assez de € ou l'IA n'a pas assez de ressources.")
         elif act == "v":
             if france["ressources"] >= qty and belgique["or"] >= cout_or:
                 france["ressources"] -= qty; france["or"] += cout_or
                 belgique["ressources"] += qty; belgique["or"] -= cout_or
-                print(f"💰 Vente réussie ! Vous avez vendu {qty} ressources pour {cout_or} Or."); action_joueur_faite = True
+                print(f"💰 Vente réussie ! Vous avez vendu {qty} ressources pour {cout_or} €."); action_joueur_faite = True
             else:
-                print("Transaction impossible : Vous manquez de ressources ou l'IA n'a plus d'Or.")
+                print("Transaction impossible : Vous manquez de ressources ou l'IA n'a plus de €.")
 
     elif choix == "6":
         if france["allie"] is not None:
@@ -247,6 +312,54 @@ while True:
         print("Vous passez votre tour pour accumuler vos bonus.")
         action_joueur_faite = True
 
+    elif choix == "8":
+        print("\n💼 Gestion de l'économie")
+        print()
+        print("1. Augmenter les taxes (+5%, +40 €, -5 bonheur)")
+        print()
+        print("2. Baisser les taxes (-5%, -30 €, +5 bonheur)")
+        print()
+        print("3. Équilibrer le budget (+40 €, +20 budget, -5 bonheur)")
+        eco = input("Choisissez une action économique : ").strip()
+
+        if eco == "1":
+            if france["or"] >= 40:
+                france["or"] -= 40
+                france["taux_imposition"] = min(35, france["taux_imposition"] + 5)
+                france["bonheur"] = max(0, france["bonheur"] - 5)
+                print("💸 Vous avez augmenté les taxes. Le budget grimpe, mais le bonheur baisse.")
+                action_joueur_faite = True
+            else:
+                print("Pas assez de € pour cette mesure.")
+        elif eco == "2":
+            if france["or"] >= 30:
+                france["or"] -= 30
+                france["taux_imposition"] = max(5, france["taux_imposition"] - 5)
+                france["bonheur"] = min(100, france["bonheur"] + 5)
+                print("📉 Vous avez baissé les taxes. Le peuple est plus heureux, mais l'État gagne moins.")
+                action_joueur_faite = True
+            else:
+                print("Pas assez de € pour cette mesure.")
+        elif eco == "3":
+            france["or"] += 40
+            france["budget"] += 20
+            france["bonheur"] = max(0, france["bonheur"] - 5)
+            print("⚖️ Vous avez équilibré le budget. L'État gagne un peu d'oxygène, mais la population se méfie.")
+            action_joueur_faite = True
+        else:
+            print("Choix invalide.")
+
+    elif choix == "9":
+        if france["ressources"] >= 200 and france["or"] >= 100:
+            france["ressources"] -= 200
+            france["or"] -= 100
+            france["population"] = min(500, france["population"] + 15)
+            france["bonheur"] = min(100, france["bonheur"] + 5)
+            print("🏠 Vous avez investi dans les logements et les services publics : la population augmente.")
+            action_joueur_faite = True
+        else:
+            print("Pas assez de ressources ou de € pour investir dans la population.")
+
     elif choix == "q":
         print("Honte a toi pauvre fou !")
         break
@@ -255,6 +368,10 @@ while True:
 
     if action_joueur_faite:
         jouer_tour_ia(belgique, france, "belgique", "france", prix_marche)
+        appliquer_economie(france, "La France")
+        appliquer_economie(belgique, "La Belgique")
+        appliquer_population(france, "La France")
+        appliquer_population(belgique, "La Belgique")
 
         for pays in [france, belgique]:
             if pays["bonheur"] < 25: 
@@ -269,7 +386,7 @@ while True:
 
         for pays, nom in [(france, "La France"), (belgique, "L'IA")]:
             if pays["fermes"] > 0 or pays["camps_militaires"] > 0 or pays["parcs_attraction"] > 0 or pays["universites"] > 0 or pays["mines"] > 0:
-                b_res = (pays["fermes"] * 35) + (pays["mines"] * 60)
+                b_res = (pays["fermes"] * 35) + (pays["mines"] * 60) + (pays["population"] // 8)
                 b_pui = pays["camps_militaires"] * 15
                 b_bon = pays["parcs_attraction"] * 10
                 b_int = pays["universites"] * 20
@@ -285,7 +402,7 @@ while True:
             belgique["ressources"] += 30
             france["or"] += 10
             belgique["or"] += 10
-            print("🤝 Bonus de Coopération de l'Alliance : +30 ressources et +10 Or chacun.")
+            print("🤝 Bonus de Coopération de l'Alliance : +30 ressources et +10 € chacun.")
 
         tour += 1
         input("\nFin du tour. Appuyez sur Entrée pour passer au tour suivant...")
