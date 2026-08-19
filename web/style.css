@@ -1,0 +1,1624 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+ 
+body {
+    min-height: 100vh;
+ 
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #171717 0%,
+            #090909 45%,
+            #050505 100%
+        );
+ 
+    color: white;
+ 
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+ 
+    overflow-x: hidden;
+}
+ 
+.background-glow {
+    position: fixed;
+ 
+    width: 700px;
+    height: 700px;
+ 
+    left: 50%;
+    top: 35%;
+ 
+    transform:
+        translate(-50%, -50%);
+ 
+    background:
+        rgba(255,255,255,0.035);
+ 
+    filter: blur(100px);
+ 
+    border-radius: 50%;
+ 
+    pointer-events: none;
+}
+ 
+ 
+.hidden {
+    display: none !important;
+}
+ 
+ 
+.start-screen {
+    position: fixed;
+ 
+    inset: 0;
+ 
+    z-index: 1000;
+ 
+    display: flex;
+ 
+    align-items: center;
+    justify-content: center;
+ 
+    background:
+        radial-gradient(
+            circle at center,
+            #171717 0%,
+            #090909 55%,
+            #030303 100%
+        );
+ 
+    transition:
+        opacity .6s ease,
+        transform .6s ease;
+}
+ 
+.start-screen.leaving {
+    opacity: 0;
+ 
+    transform:
+        translateY(-35px);
+ 
+    pointer-events: none;
+}
+ 
+.start-card {
+    width:
+        min(700px, 90%);
+ 
+    padding: 60px;
+ 
+    text-align: center;
+ 
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+ 
+    border-radius: 24px;
+ 
+    background:
+        rgba(15,15,15,.85);
+ 
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.7),
+ 
+        inset 0 1px
+        rgba(255,255,255,.05);
+ 
+    animation:
+        startCardIn .8s ease both;
+}
+ 
+.start-logo {
+    display: flex;
+ 
+    flex-direction: column;
+ 
+    font-size: 18px;
+ 
+    letter-spacing: 8px;
+}
+ 
+.start-logo strong {
+    font-size: 62px;
+ 
+    letter-spacing: 3px;
+}
+ 
+.start-subtitle {
+    margin:
+        45px 0 25px;
+ 
+    color: #888;
+ 
+    font-size: 12px;
+ 
+    letter-spacing: 4px;
+}
+ 
+.players-inputs {
+    display: flex;
+ 
+    align-items: center;
+ 
+    gap: 18px;
+}
+ 
+.player-input {
+    flex: 1;
+ 
+    text-align: left;
+}
+ 
+.player-input label {
+    display: block;
+ 
+    margin-bottom: 9px;
+ 
+    color: #777;
+ 
+    font-size: 10px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.player-input input {
+    width: 100%;
+ 
+    height: 52px;
+ 
+    padding: 0 16px;
+ 
+    border:
+        1px solid #2a2a2a;
+ 
+    border-radius: 10px;
+ 
+    outline: none;
+ 
+    background: #0b0b0b;
+ 
+    color: white;
+ 
+    font-size: 15px;
+ 
+    transition: .2s;
+}
+ 
+.player-input .budget-label {
+    display: block;
+ 
+    margin-top: 15px;
+ 
+    margin-bottom: 9px;
+ 
+    color: #777;
+ 
+    font-size: 10px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.player-input input:focus {
+    border-color: #777;
+ 
+    box-shadow:
+        0 0 20px
+        rgba(255,255,255,.06);
+}
+ 
+.vs {
+    margin-top: 22px;
+ 
+    color: #666;
+ 
+    font-size: 11px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.game-setup-row {
+    display: flex;
+ 
+    align-items: center;
+    justify-content: center;
+ 
+    gap: 30px;
+ 
+    margin-top: 30px;
+}
+ 
+.mode-choice {
+    display: flex;
+ 
+    align-items: center;
+ 
+    gap: 12px;
+}
+ 
+.mode-choice label {
+    color: #aaa;
+ 
+    font-size: 10px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.mode-choice select {
+    height: 44px;
+ 
+    padding: 0 16px;
+ 
+    border:
+        1px solid #2a2a2a;
+ 
+    border-radius: 10px;
+ 
+    background: #0b0b0b;
+ 
+    color: white;
+ 
+    font-size: 11px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.blind-switch-row {
+    display: flex;
+ 
+    align-items: center;
+ 
+    gap: 12px;
+}
+ 
+.switch-label {
+    color: #aaa;
+ 
+    font-size: 10px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.switch {
+    position: relative;
+ 
+    display: inline-block;
+ 
+    width: 50px;
+ 
+    height: 26px;
+}
+ 
+.switch input {
+    opacity: 0;
+ 
+    width: 0;
+ 
+    height: 0;
+}
+ 
+.slider {
+    position: absolute;
+ 
+    cursor: pointer;
+ 
+    inset: 0;
+ 
+    border-radius: 999px;
+ 
+    background: #282828;
+ 
+    border: 1px solid #555;
+ 
+    transition: .2s;
+}
+ 
+.slider:before {
+    content: "";
+ 
+    position: absolute;
+ 
+    width: 18px;
+ 
+    height: 18px;
+ 
+    left: 3px;
+ 
+    top: 3px;
+ 
+    border-radius: 50%;
+ 
+    background: white;
+ 
+    transition: .2s;
+}
+ 
+.switch input:checked + .slider {
+    background: #fff;
+ 
+    border-color: #fff;
+}
+ 
+.switch input:checked + .slider:before {
+    transform:
+        translateX(24px);
+ 
+    background: #111;
+}
+ 
+.garage-capacity-row {
+    display: flex;
+ 
+    align-items: center;
+    justify-content: center;
+ 
+    gap: 14px;
+ 
+    margin-top: 30px;
+}
+ 
+.garage-capacity-row label {
+    color: #aaa;
+ 
+    font-size: 10px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.garage-capacity-row input {
+    width: 120px;
+ 
+    height: 44px;
+ 
+    padding: 0 12px;
+ 
+    border:
+        1px solid #2a2a2a;
+ 
+    border-radius: 10px;
+ 
+    outline: none;
+ 
+    background: #0b0b0b;
+ 
+    color: white;
+ 
+    font-size: 14px;
+ 
+    text-align: center;
+}
+ 
+.garage-capacity-row input:focus {
+    border-color: #777;
+ 
+    box-shadow:
+        0 0 20px
+        rgba(255,255,255,.06);
+}
+ 
+.start-game-button {
+    width: 100%;
+ 
+    height: 56px;
+ 
+    margin-top: 35px;
+ 
+    border: 0;
+ 
+    border-radius: 10px;
+ 
+    background: white;
+ 
+    color: black;
+ 
+    font-weight: 800;
+ 
+    letter-spacing: 2px;
+ 
+    cursor: pointer;
+ 
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+ 
+.start-game-button span {
+    margin-left: 15px;
+ 
+    font-size: 18px;
+}
+ 
+.start-game-button:hover {
+    transform:
+        translateY(-2px);
+ 
+    box-shadow:
+        0 12px 35px
+        rgba(255,255,255,.12);
+}
+ 
+@keyframes startCardIn {
+ 
+    from {
+        opacity: 0;
+ 
+        transform:
+            translateY(35px)
+            scale(.97);
+    }
+ 
+    to {
+        opacity: 1;
+ 
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+ 
+ 
+.game-screen.appearing {
+    animation:
+        gameAppear .8s ease both;
+}
+ 
+@keyframes gameAppear {
+ 
+    from {
+        opacity: 0;
+ 
+        transform:
+            translateY(25px);
+    }
+ 
+    to {
+        opacity: 1;
+ 
+        transform:
+            translateY(0);
+    }
+}
+ 
+ 
+.topbar {
+    position: relative;
+ 
+    z-index: 10;
+ 
+    display: grid;
+ 
+    grid-template-columns:
+        1fr auto 1fr;
+ 
+    align-items: center;
+ 
+    padding:
+        25px 45px;
+ 
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+}
+ 
+.logo {
+    display: flex;
+ 
+    flex-direction: column;
+ 
+    letter-spacing: 5px;
+ 
+    font-size: 11px;
+}
+ 
+.logo strong {
+    font-size: 25px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.round {
+    text-align: center;
+}
+ 
+.round small {
+    display: block;
+ 
+    color: #666;
+ 
+    font-size: 9px;
+ 
+    letter-spacing: 3px;
+}
+ 
+.round strong {
+    font-size: 27px;
+}
+ 
+.round span {
+    color: #555;
+}
+ 
+.player-budgets {
+    display: flex;
+ 
+    justify-content: flex-end;
+ 
+    gap: 30px;
+}
+ 
+.budget {
+    display: flex;
+ 
+    flex-direction: column;
+ 
+    text-align: right;
+}
+ 
+.budget span {
+    color: #666;
+ 
+    font-size: 9px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.budget strong {
+    margin-top: 3px;
+ 
+    font-size: 15px;
+}
+ 
+ 
+main {
+    width:
+        min(1250px, 94%);
+ 
+    margin: auto;
+}
+ 
+ 
+.car-showcase {
+    position: relative;
+ 
+    min-height: 480px;
+ 
+    display: grid;
+ 
+    grid-template-columns:
+        80px 1fr 1fr;
+ 
+    align-items: center;
+ 
+    gap: 25px;
+ 
+    padding:
+        30px 30px 20px;
+ 
+    transition: .4s ease;
+}
+ 
+.car-showcase.drawing {
+    transform:
+        scale(.985);
+}
+ 
+.car-number {
+    align-self: center;
+ 
+    color: #444;
+ 
+    font-size: 14px;
+ 
+    letter-spacing: 3px;
+ 
+    writing-mode:
+        vertical-rl;
+}
+ 
+.car-photo {
+    position: relative;
+ 
+    height: 390px;
+ 
+    display: flex;
+ 
+    align-items: center;
+ 
+    justify-content: center;
+ 
+    overflow: visible;
+}
+ 
+.car-photo img {
+    position: relative;
+ 
+    z-index: 5;
+ 
+    width: 100%;
+ 
+    max-width: 650px;
+ 
+    height: 390px;
+ 
+    object-fit: contain;
+ 
+    filter:
+        drop-shadow(
+            0 30px 30px
+            rgba(0,0,0,.7)
+        );
+ 
+    transition:
+        opacity .35s ease,
+        transform .35s ease;
+}
+ 
+.photo-light {
+    position: absolute;
+ 
+    width: 75%;
+ 
+    height: 75%;
+ 
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255,255,255,.09),
+            transparent 70%
+        );
+ 
+    filter: blur(20px);
+}
+ 
+.photo-ring {
+    position: absolute;
+ 
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+ 
+    border-radius: 50%;
+ 
+    pointer-events: none;
+}
+ 
+.ring-one {
+    width: 290px;
+ 
+    height: 290px;
+}
+ 
+.ring-two {
+    width: 380px;
+ 
+    height: 380px;
+ 
+    border-color:
+        rgba(255,255,255,.035);
+}
+ 
+.photo-dot {
+    position: absolute;
+ 
+    width: 5px;
+ 
+    height: 5px;
+ 
+    border-radius: 50%;
+ 
+    background: white;
+ 
+    opacity: .5;
+ 
+    box-shadow:
+        0 0 12px
+        rgba(255,255,255,.8);
+}
+ 
+.dot-one {
+    top: 20%;
+    left: 15%;
+}
+ 
+.dot-two {
+    top: 18%;
+    right: 16%;
+}
+ 
+.dot-three {
+    bottom: 18%;
+    left: 22%;
+}
+ 
+.dot-four {
+    bottom: 15%;
+    right: 20%;
+}
+ 
+.image-placeholder {
+    position: absolute;
+ 
+    z-index: 4;
+ 
+    color: #444;
+ 
+    font-size: 11px;
+ 
+    letter-spacing: 5px;
+}
+ 
+.car-details {
+    position: relative;
+ 
+    z-index: 5;
+ 
+    padding-left: 20px;
+}
+ 
+.car-brand {
+    color: #888;
+ 
+    font-size: 12px;
+ 
+    letter-spacing: 4px;
+}
+ 
+.car-details h1 {
+    margin-top: 5px;
+ 
+    font-size:
+        clamp(42px, 5vw, 75px);
+ 
+    line-height: .95;
+ 
+    letter-spacing: -3px;
+}
+ 
+.car-meta {
+    display: flex;
+ 
+    gap: 12px;
+ 
+    margin-top: 22px;
+ 
+    color: #777;
+ 
+    font-size: 10px;
+ 
+    letter-spacing: 2px;
+}
+ 
+ 
+.auction-panel {
+    width:
+        min(750px, 100%);
+ 
+    margin:
+        0 auto 50px;
+ 
+    padding:
+        25px 30px;
+ 
+    border-top:
+        1px solid
+        rgba(255,255,255,.08);
+ 
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.08);
+}
+ 
+.auction-status {
+    display: flex;
+ 
+    justify-content: center;
+ 
+    align-items: center;
+ 
+    gap: 9px;
+ 
+    color: #888;
+ 
+    font-size: 10px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.status-dot {
+    width: 6px;
+ 
+    height: 6px;
+ 
+    border-radius: 50%;
+ 
+    background: white;
+ 
+    box-shadow:
+        0 0 10px
+        rgba(255,255,255,.8);
+ 
+    animation:
+        pulse 1.4s infinite;
+}
+ 
+@keyframes pulse {
+ 
+    50% {
+        opacity: .35;
+    }
+}
+ 
+.auction-content {
+    text-align: center;
+ 
+    margin-top: 25px;
+}
+ 
+.auction-label {
+    margin-bottom: 15px;
+ 
+    color: #555;
+ 
+    font-size: 9px;
+ 
+    letter-spacing: 3px;
+}
+ 
+.price-input-wrapper {
+    display: flex;
+ 
+    align-items: center;
+ 
+    width: 280px;
+ 
+    height: 48px;
+ 
+    margin:
+        0 auto 14px;
+ 
+    padding:
+        0 14px;
+ 
+    border:
+        1px solid #292929;
+ 
+    border-radius: 8px;
+ 
+    background: #0b0b0b;
+}
+ 
+.price-input-wrapper input {
+    flex: 1;
+ 
+    width: 100%;
+ 
+    border: none;
+ 
+    outline: none;
+ 
+    background: transparent;
+ 
+    color: white;
+ 
+    font-size: 17px;
+}
+ 
+.price-input-wrapper span {
+    color: #555;
+}
+ 
+ 
+.main-button {
+    display: inline-flex;
+ 
+    align-items: center;
+ 
+    justify-content: center;
+ 
+    gap: 15px;
+ 
+    min-width: 150px;
+ 
+    height: 48px;
+ 
+    padding:
+        0 22px;
+ 
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+ 
+    border-radius: 6px;
+ 
+    background:
+        rgba(255,255,255,.035);
+ 
+    color: #aaa;
+ 
+    font-size: 10px;
+ 
+    font-weight: 700;
+ 
+    letter-spacing: 2px;
+ 
+    cursor: pointer;
+ 
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+ 
+.main-button:hover {
+    background:
+        rgba(255,255,255,.08);
+ 
+    border-color:
+        rgba(255,255,255,.35);
+ 
+    color: white;
+ 
+    transform:
+        translateY(-1px);
+ 
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,.25);
+}
+ 
+.main-button:active {
+    transform:
+        translateY(0);
+}
+ 
+.button-arrow {
+    font-size: 17px;
+ 
+    color: #777;
+ 
+    transition: .2s ease;
+}
+ 
+.main-button:hover .button-arrow {
+    color: white;
+ 
+    transform:
+        translateX(3px);
+}
+ 
+ 
+.fold-button {
+    height: 48px;
+ 
+    padding:
+        0 20px;
+ 
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+ 
+    border-radius: 6px;
+ 
+    background: transparent;
+ 
+    color: #555;
+ 
+    font-size: 9px;
+ 
+    font-weight: 600;
+ 
+    letter-spacing: 1.5px;
+ 
+    cursor: pointer;
+ 
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+ 
+.fold-button:hover {
+    background:
+        rgba(255,255,255,.035);
+ 
+    border-color:
+        rgba(255,255,255,.2);
+ 
+    color: #aaa;
+}
+ 
+ 
+.current-price-label {
+    color: #555;
+ 
+    font-size: 9px;
+ 
+    letter-spacing: 3px;
+}
+ 
+.current-price {
+    margin-top: 5px;
+ 
+    font-size: 38px;
+ 
+    font-weight: 800;
+}
+ 
+.turn-player {
+    margin-top: 10px;
+ 
+    color: #666;
+ 
+    font-size: 9px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.turn-player strong {
+    margin-left: 5px;
+ 
+    color: white;
+}
+ 
+.bid-actions {
+    display: flex;
+ 
+    align-items: center;
+ 
+    justify-content: center;
+ 
+    gap: 10px;
+ 
+    margin-top: 20px;
+}
+ 
+.price-input-wrapper.small {
+    width: 210px;
+ 
+    margin: 0;
+}
+ 
+.bid-actions .main-button {
+    min-width: 150px;
+}
+ 
+ 
+.garages-section {
+    padding-bottom: 60px;
+}
+ 
+.garage-title {
+    display: flex;
+ 
+    align-items: center;
+ 
+    gap: 15px;
+ 
+    margin-bottom: 15px;
+ 
+    color: #555;
+ 
+    font-size: 9px;
+ 
+    letter-spacing: 3px;
+}
+ 
+.garage-title div {
+    flex: 1;
+ 
+    height: 1px;
+ 
+    background:
+        rgba(255,255,255,.06);
+}
+ 
+.garages {
+    display: grid;
+ 
+    grid-template-columns:
+        1fr 1fr;
+ 
+    gap: 20px;
+}
+ 
+.garage {
+    min-height: 120px;
+ 
+    padding: 18px;
+ 
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+ 
+    border-radius: 10px;
+ 
+    background:
+        rgba(255,255,255,.015);
+}
+ 
+.garage-header {
+    padding-bottom: 12px;
+ 
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.05);
+}
+ 
+.garage-header div {
+    display: flex;
+ 
+    justify-content: space-between;
+}
+ 
+.garage-header span {
+    color: #777;
+ 
+    font-size: 9px;
+ 
+    letter-spacing: 2px;
+}
+ 
+.garage-header strong {
+    color: #555;
+ 
+    font-size: 10px;
+}
+ 
+.garage-cars {
+    display: flex;
+ 
+    flex-direction: column;
+ 
+    gap: 5px;
+ 
+    margin-top: 10px;
+}
+ 
+.garage-car {
+    display: flex;
+ 
+    justify-content: space-between;
+ 
+    padding:
+        8px 10px;
+ 
+    border-radius: 5px;
+ 
+    background:
+        rgba(255,255,255,.025);
+}
+ 
+.garage-car-name {
+    font-size: 10px;
+}
+ 
+.garage-car-year {
+    color: #555;
+ 
+    font-size: 10px;
+}
+ 
+.empty-garage {
+    padding: 15px;
+ 
+    text-align: center;
+ 
+    color: #444;
+ 
+    font-size: 10px;
+}
+ 
+ 
+.blind-mode-instruction {
+    position: fixed;
+ 
+    left: 50%;
+    top: 50%;
+ 
+    z-index: 600;
+ 
+    transform:
+        translate(-50%, -50%);
+ 
+    width:
+        min(780px, calc(100vw - 40px));
+ 
+    padding:
+        28px 34px;
+ 
+    border:
+        1px solid
+        rgba(255,255,255,.22);
+ 
+    border-radius: 16px;
+ 
+    background:
+        rgba(30,30,30,.96);
+ 
+    box-shadow:
+        0 24px 90px
+        rgba(0,0,0,.75);
+ 
+    color: white;
+ 
+    font-size: 24px;
+ 
+    font-weight: 800;
+ 
+    line-height: 1.5;
+ 
+    letter-spacing: 2px;
+ 
+    text-align: center;
+}
+ 
+ 
+.notification {
+    position: fixed;
+ 
+    left: 50%;
+ 
+    bottom: 25px;
+ 
+    z-index: 500;
+ 
+    transform:
+        translate(-50%, 30px);
+ 
+    opacity: 0;
+ 
+    padding:
+        13px 22px;
+ 
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+ 
+    border-radius: 8px;
+ 
+    background: #111;
+ 
+    color: white;
+ 
+    font-size: 11px;
+ 
+    pointer-events: none;
+ 
+    transition: .3s;
+}
+ 
+.notification.show {
+    transform:
+        translate(-50%, 0);
+ 
+    opacity: 1;
+}
+ 
+ 
+@keyframes carEnter {
+ 
+    from {
+        opacity: 0;
+ 
+        transform:
+            translateY(20px)
+            scale(.97);
+    }
+ 
+    to {
+        opacity: 1;
+ 
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+ 
+@keyframes contentEnter {
+ 
+    from {
+        opacity: 0;
+ 
+        transform:
+            translateY(5px);
+    }
+ 
+    to {
+        opacity: 1;
+ 
+        transform:
+            translateY(0);
+    }
+}
+ 
+ 
+.price-input-wrapper input[type="number"] {
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+}
+ 
+.price-input-wrapper input[type="number"]::-webkit-inner-spin-button,
+.price-input-wrapper input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    display: none !important;
+    margin: 0 !important;
+}
+ 
+ 
+@media (max-width: 800px) {
+ 
+    .topbar {
+        grid-template-columns:
+            1fr auto;
+ 
+        padding: 20px;
+    }
+ 
+    .player-budgets {
+        grid-column:
+            1 / -1;
+ 
+        justify-content:
+            center;
+ 
+        margin-top: 15px;
+    }
+ 
+    .car-showcase {
+        grid-template-columns:
+            1fr;
+ 
+        padding-top: 30px;
+    }
+ 
+    .car-number {
+        display: none;
+    }
+ 
+    .car-photo {
+        height: 300px;
+    }
+ 
+    .car-photo img {
+        height: 300px;
+    }
+ 
+    .car-details {
+        text-align: center;
+ 
+        padding: 0;
+    }
+ 
+    .car-meta {
+        justify-content:
+            center;
+    }
+ 
+    .garages {
+        grid-template-columns:
+            1fr;
+    }
+ 
+    .players-inputs {
+        flex-direction:
+            column;
+    }
+ 
+    .vs {
+        margin: 0;
+    }
+ 
+    .bid-actions {
+        flex-direction:
+            column;
+    }
+ 
+    .price-input-wrapper.small,
+    .bid-actions .main-button,
+    .fold-button {
+        width: 100%;
+ 
+        min-width: 0;
+    }
+}
+ 
+ 
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap');
+ 
+body.theme-anime {
+    font-family: 'Baloo 2', Arial, sans-serif;
+ 
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #2a1a3d 0%,
+            #170b28 45%,
+            #0a0512 100%
+        );
+}
+ 
+body.theme-anime .background-glow {
+    background:
+        rgba(255, 110, 199, 0.07);
+}
+ 
+body.theme-anime .start-screen {
+    background:
+        radial-gradient(
+            circle at center,
+            #2a1a3d 0%,
+            #170b28 55%,
+            #08040f 100%
+        );
+}
+ 
+body.theme-anime .start-card {
+    border-color:
+        rgba(255, 110, 199, .18);
+ 
+    background:
+        rgba(25, 12, 35, .85);
+}
+ 
+body.theme-anime .start-logo,
+body.theme-anime .logo {
+    color: #ff9fdc;
+}
+ 
+body.theme-anime .start-logo strong,
+body.theme-anime .logo strong {
+    background:
+        linear-gradient(
+            90deg,
+            #ff6ec7,
+            #7c4dff,
+            #4dd0ff
+        );
+ 
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+ 
+body.theme-anime .car-details h1 {
+    background:
+        linear-gradient(
+            90deg,
+            #ff6ec7,
+            #7c4dff,
+            #4dd0ff
+        );
+ 
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+ 
+body.theme-anime .player-input input:focus,
+body.theme-anime .garage-capacity-row input:focus {
+    border-color: #ff6ec7;
+ 
+    box-shadow:
+        0 0 20px
+        rgba(255, 110, 199, .18);
+}
+ 
+body.theme-anime .start-game-button {
+    background:
+        linear-gradient(
+            90deg,
+            #ff6ec7,
+            #7c4dff
+        );
+ 
+    color: white;
+}
+ 
+body.theme-anime .start-game-button:hover {
+    box-shadow:
+        0 12px 35px
+        rgba(255, 110, 199, .3);
+}
+ 
+body.theme-anime .switch input:checked + .slider {
+    background:
+        linear-gradient(
+            90deg,
+            #ff6ec7,
+            #7c4dff
+        );
+ 
+    border-color: transparent;
+}
+ 
+body.theme-anime .photo-ring {
+    border-color:
+        rgba(255, 110, 199, .16);
+}
+ 
+body.theme-anime .photo-light {
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255, 110, 199, .14),
+            transparent 70%
+        );
+}
+ 
+body.theme-anime .status-dot {
+    background: #ff6ec7;
+ 
+    box-shadow:
+        0 0 10px
+        rgba(255, 110, 199, .8);
+}
+ 
+body.theme-anime .current-price {
+    color: #ff9fdc;
+}
+ 
+body.theme-anime .main-button {
+    border-color:
+        rgba(255, 110, 199, .3);
+ 
+    color: #ffb8e6;
+}
+ 
+body.theme-anime .main-button:hover {
+    background:
+        rgba(255, 110, 199, .1);
+ 
+    border-color: #ff6ec7;
+ 
+    color: white;
+ 
+    box-shadow:
+        0 8px 25px
+        rgba(255, 110, 199, .25);
+}
+ 
+body.theme-anime .button-arrow {
+    color: #ff9fdc;
+}
+ 
+body.theme-anime .fold-button:hover {
+    border-color:
+        rgba(255, 110, 199, .3);
+ 
+    color: #ffb8e6;
+}
+ 
+body.theme-anime .garage {
+    border-color:
+        rgba(255, 110, 199, .12);
+ 
+    background:
+        rgba(255, 110, 199, .02);
+}
+ 
+body.theme-anime .garage-header {
+    border-bottom-color:
+        rgba(255, 110, 199, .1);
+}
+ 
+body.theme-anime .garage-title div {
+    background:
+        rgba(255, 110, 199, .12);
+}
+ 
+body.theme-anime .blind-mode-instruction {
+    border-color:
+        rgba(255, 110, 199, .3);
+ 
+    background:
+        rgba(35, 15, 45, .96);
+}
